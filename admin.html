@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">الإحصائيات</div>
+      <a class="sidebar-link active" href="#" onclick="showSection('overview')">📊 نظرة عامة</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">إدارة المحتوى</div>
+      <a class="sidebar-link" href="#" onclick="showSection('books')">📚 إدارة الكتب</a>
+      <a class="sidebar-link" href="#" onclick="showSection('borrows')">🔄 إدارة الاستعارات</a>
+      <a class="sidebar-link" href="#" onclick="showSection('waitlist')">⏳ قوائم الانتظار</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">المستخدمون</div>
+      <a class="sidebar-link" href="#" onclick="showSection('users')">👥 إدارة الأعضاء</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">إعارات المستخدمين</div>
+      <a class="sidebar-link" href="#" onclick="showSection('donations')" id="donationsLink">🎁 طلبات الإعارة <span id="donationsBadge" style="display:none;background:var(--danger);color:#fff;border-radius:20px;padding:0.1rem 0.5rem;font-size:0.75rem;margin-right:0.3rem"></span></a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="admin-content">
+
+    <!-- ── OVERVIEW ── -->
+    <div id="section-overview">
+      <h2 style="margin-bottom:1.5rem">📊 نظرة عامة</h2>
+      <div class="stats-grid" id="overviewStats"></div>
+
+      <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:0">
+        <div class="card">
+          <div class="card-header"><div class="card-title">⏳ آخر طلبات الاستعارة</div></div>
+          <div class="table-wrap">
+            <table><thead><tr><th>المستخدم</th><th>الكتاب</th><th>التاريخ</th><th>إجراء</th></tr></thead>
+            <tbody id="recentRequests"></tbody></table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚠️ استعارات متأخرة</div></div>
+          <div class="table-wrap">
+            <table><thead><tr><th>المستخدم</th><th>الكتاب</th><th>موعد الإرجاع</th></tr></thead>
+            <tbody id="overdueList"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BOOKS ── -->
+    <div id="section-books" style="display:none">
+      <div class="section-header">
+        <h2>📚 إدارة الكتب</h2>
+        <button class="btn btn-primary" onclick="openModal('bookModal')">➕ إضافة كتاب</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="search-input-wrap" style="width:280px">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="bookSearch" class="search-input" placeholder="بحث..." onkeyup="filterBooksTable()">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الكتاب</th><th>المؤلف</th><th>التصنيف</th><th>النسخ</th><th>المتاح</th><th>إجراءات</th></tr></thead>
+            <tbody id="booksTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BORROWS ── -->
+    <div id="section-borrows" style="display:none">
+      <h2 style="margin-bottom:1.5rem">🔄 إدارة الاستعارات</h2>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchBorrowTab('pending',event)">⏳ طلبات معلقة</button>
+        <button class="tab-btn" onclick="switchBorrowTab('active',event)">📖 نشطة</button>
+        <button class="tab-btn" onclick="switchBorrowTab('all',event)">📋 الكل</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>المستخدم</th><th>الكتاب</th><th>تاريخ الطلب</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+            <tbody id="borrowsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WAITLIST ── -->
+    <div id="section-waitlist" style="display:none">
+      <h2 style="margin-bottom:1.5rem">⏳ قوائم الانتظار</h2>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>المستخدم</th><th>الكتاب</th><th>الموقع</th><th>تاريخ الانضمام</th><th>إجراء</th></tr></thead>
+            <tbody id="waitlistTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div id="section-users" style="display:none">
+      <h2 style="margin-bottom:1.5rem">👥 إدارة الأعضاء</h2>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الاسم</th><th>البريد</th><th>الجوال</th><th>الحالة</th><th>تاريخ التسجيل</th><th>إجراءات</th></tr></thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── DONATIONS ── -->
+    <div id="section-donations" style="display:none">
+      <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+        <h2 style="margin:0">🎁 طلبات إعارة الكتب</h2>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn btn-outline btn-sm" onclick="filterDonations('pending')"   id="dfPending">⏳ معلقة</button>
+          <button class="btn btn-outline btn-sm" onclick="filterDonations('approved')"  id="dfApproved">✅ مقبولة</button>
+          <button class="btn btn-outline btn-sm" onclick="filterDonations('rejected')"  id="dfRejected">❌ مرفوضة</button>
+          <button class="btn btn-outline btn-sm" onclick="filterDonations('')"           id="dfAll">الكل</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الكتاب</th>
+                <th>المستخدم</th>
+                <th>نوع الإعارة</th>
+                <th>تاريخ الطلب</th>
+                <th>الحالة</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="donationsTable"><tr><td colspan="6" style="text-align:center;padding:2rem"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── ADD/EDIT BOOK MODAL ── -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="bookModalTitle">➕ إضافة كتاب جديد</div>
+      <button class="modal-close" onclick="closeModal('bookModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="bookId">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="bookTitleInput">عنوان الكتاب *</label>
+          <input type="text" id="bookTitleInput" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="bookAuthorInput">اسم المؤلف *</label>
+          <input type="text" id="bookAuthorInput" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="bookCatInput">التصنيف</label>
+          <select id="bookCatInput" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">سنة النشر</label>
+          <input type="number" id="bookYearInput" class="form-control" placeholder="2024">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">الرقم التعريفي (ISBN)</label>
+          <input type="text" id="bookIsbnInput" class="form-control" placeholder="978-...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="bookCopiesInput">عدد النسخ الإجمالي</label>
+          <input type="number" id="bookCopiesInput" class="form-control" value="1" min="1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">رابط صورة الغلاف</label>
+        <input type="text" id="bookCoverInput" class="form-control" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="bookDescInput">وصف الكتاب</label>
+        <textarea id="bookDescInput" class="form-control" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('bookModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveBook()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer"><p>📚 كنز الكتب — لوحة التحكم © 2024</p></footer>
+
+<script src="core.js"></script>
+<script>
+if (!auth.requireAdmin()) throw new Error('Not admin');
+
+let allBooksData = [];
+let allUsersData = [];
+let catMapData = {};
+let currentBorrowFilter = 'pending';
+
+function showSection(name) {
+  document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+  document.getElementById(`section-${name}`).style.display = 'block';
+  document.querySelectorAll('.sidebar-link').forEach(a => a.classList.remove('active'));
+  event.target.classList.add('active');
+
+  if (name === 'overview') loadOverview();
+  else if (name === 'books') loadBooksTable();
+  else if (name === 'borrows') loadBorrowsTable('pending');
+  else if (name === 'waitlist') loadWaitlistTable();
+  else if (name === 'users') loadUsersTable();
+  else if (name === 'donations') loadDonationsTable('pending');
+}
+
+/* ── OVERVIEW ── */
+async function loadOverview() {
+  const [books, users, borrows, waitlist] = await Promise.all([
+    api.get('/books'), api.get('/users?role=user'),
+    api.get('/borrows'), api.get('/waitlist?status=waiting')
+  ]);
+
+  const bookMap = {}; books.forEach(b => bookMap[b.id] = b);
+  const userMap = {}; users.forEach(u => userMap[u.id] = u);
+  const allUsers = await api.get('/users');
+  const allUserMap = {}; allUsers.forEach(u => allUserMap[u.id] = u);
+
+  const active = borrows.filter(b => b.status === 'active');
+  const pending = borrows.filter(b => b.status === 'pending');
+
+  document.getElementById('overviewStats').innerHTML = `
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(26,58,92,0.1)">📚</div><div><div class="stat-num">${books.length}</div><div class="stat-label">إجمالي الكتب</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(46,125,82,0.1)">👥</div><div><div class="stat-num">${users.length}</div><div class="stat-label">أعضاء مسجّلون</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(200,135,42,0.1)">📖</div><div><div class="stat-num">${active.length}</div><div class="stat-label">استعارات نشطة</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(212,136,10,0.1)">⏳</div><div><div class="stat-num">${pending.length}</div><div class="stat-label">طلبات معلقة</div></div></div>
+  `;
+
+  // Recent requests
+  const recentReq = pending.slice(0, 5);
+  document.getElementById('recentRequests').innerHTML = recentReq.length
+    ? recentReq.map(b => `<tr>
+        <td>${allUserMap[b.user_id]?.name || '—'}</td>
+        <td>${bookMap[b.book_id]?.title || '—'}</td>
+        <td>${dateUtil.format(b.request_date)}</td>
+        <td>
+          <button class="btn btn-success btn-sm" onclick="approveBorrow(${b.id})">✅ موافقة</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectBorrow(${b.id})" style="margin-right:0.3rem">❌ رفض</button>
+        </td>
+      </tr>`).join('')
+    : `<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--muted)">لا توجد طلبات معلقة</td></tr>`;
+
+  // Overdue
+  const overdue = active.filter(b => dateUtil.isOverdue(b.due_date));
+  document.getElementById('overdueList').innerHTML = overdue.length
+    ? overdue.map(b => `<tr>
+        <td>${allUserMap[b.user_id]?.name || '—'}</td>
+        <td>${bookMap[b.book_id]?.title || '—'}</td>
+        <td style="color:var(--danger);font-weight:700">${dateUtil.format(b.due_date)}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:var(--muted)">لا توجد استعارات متأخرة 🎉</td></tr>`;
+}
+
+/* ── BOOKS TABLE ── */
+async function loadBooksTable() {
+  catMapData = await getCategoryMap();
+  allBooksData = await api.get('/books?_sort=added_at&_order=desc');
+  renderBooksTable(allBooksData);
+
+  // Populate category select in modal
+  const sel = document.getElementById('bookCatInput');
+  sel.innerHTML = '';
+  Object.values(catMapData).forEach(c => {
+    sel.innerHTML += `<option value="${c.id}">${c.icon} ${c.name}</option>`;
+  });
+}
+
+function filterBooksTable() {
+  const q = document.getElementById('bookSearch').value.toLowerCase();
+  renderBooksTable(allBooksData.filter(b =>
+    b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)
+  ));
+}
+
+function renderBooksTable(books) {
+  document.getElementById('booksTable').innerHTML = books.map(b => `<tr>
+    <td><a href="book.html?id=${b.id}" target="_blank" style="font-weight:700;color:var(--primary)">${b.title}</a></td>
+    <td>${b.author}</td>
+    <td>${catMapData[b.category_id]?.icon || ''} ${catMapData[b.category_id]?.name || '—'}</td>
+    <td>${b.total_copies}</td>
+    <td><span class="status-badge ${b.available_copies > 0 ? 'status-active' : 'status-rejected'}">${b.available_copies}</span></td>
+    <td>
+      <button class="btn btn-outline btn-sm" onclick="editBook(${b.id})">✏️ تعديل</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteBook(${b.id})" style="margin-right:0.3rem">🗑️</button>
+    </td>
+  </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">لا توجد كتب</td></tr>`;
+}
+
+function editBook(id) {
+  const book = allBooksData.find(b => b.id === id);
+  if (!book) return;
+  document.getElementById('bookModalTitle').textContent = '✏️ تعديل الكتاب';
+  document.getElementById('bookId').value = id;
+  document.getElementById('bookTitleInput').value = book.title;
+  document.getElementById('bookAuthorInput').value = book.author;
+  document.getElementById('bookCatInput').value = book.category_id;
+  document.getElementById('bookYearInput').value = book.publish_year;
+  document.getElementById('bookIsbnInput').value = book.isbn;
+  document.getElementById('bookCopiesInput').value = book.total_copies;
+  document.getElementById('bookCoverInput').value = book.cover;
+  document.getElementById('bookDescInput').value = book.description;
+  openModal('bookModal');
+}
+
+function resetBookModal() {
+  document.getElementById('bookModalTitle').textContent = '➕ إضافة كتاب جديد';
+  document.getElementById('bookId').value = '';
+  ['bookTitleInput','bookAuthorInput','bookYearInput','bookIsbnInput','bookCoverInput','bookDescInput'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('bookCopiesInput').value = 1;
+}
+
+document.getElementById('bookModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('bookModal')) resetBookModal();
+});
+
+async function saveBook() {
+  const id = document.getElementById('bookId').value;
+  const title = document.getElementById('bookTitleInput').value.trim();
+  const author = document.getElementById('bookAuthorInput').value.trim();
+  if (!title || !author) { toast('الاسم والمؤلف مطلوبان', 'warning'); return; }
+
+  const copies = parseInt(document.getElementById('bookCopiesInput').value) || 1;
+  const data = {
+    title, author,
+    category_id: parseInt(document.getElementById('bookCatInput').value),
+    publish_year: parseInt(document.getElementById('bookYearInput').value) || new Date().getFullYear(),
+    isbn: document.getElementById('bookIsbnInput').value.trim(),
+    total_copies: copies,
+    cover: document.getElementById('bookCoverInput').value.trim() || 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop',
+    description: document.getElementById('bookDescInput').value.trim(),
+  };
+
+  try {
+    if (id) {
+      await api.patch(`/books/${id}`, data);
+      toast('تم تعديل الكتاب ✅', 'success');
+    } else {
+      data.available_copies = copies;
+      data.added_at = new Date().toISOString();
+      await api.post('/books', data);
+      toast('تمت إضافة الكتاب ✅', 'success');
+    }
+    closeModal('bookModal');
+    resetBookModal();
+    loadBooksTable();
+  } catch(e) { toast('خطأ في الحفظ', 'error'); }
+}
+
+async function deleteBook(id) {
+  const book = allBooksData.find(b => b.id === id);
+  const bookName = book ? book.title : 'هذا الكتاب';
+  confirmAction(`هل تريد حذف "${bookName}" نهائيًا؟<br><small style="color:var(--muted)">سيتم حذف جميع طلبات الاستعارة وقوائم الانتظار المرتبطة به تلقائيًا.</small>`, async () => {
+    try {
+      // حذف طلبات الاستعارة المرتبطة بالكتاب
+      const borrows = await api.get(`/borrows?book_id=${id}`);
+      for (const b of borrows) await api.delete(`/borrows/${b.id}`);
+
+      // حذف قوائم الانتظار المرتبطة بالكتاب
+      const waitlist = await api.get(`/waitlist?book_id=${id}`);
+      for (const w of waitlist) await api.delete(`/waitlist/${w.id}`);
+
+      // حذف الكتاب نفسه
+      await api.delete(`/books/${id}`);
+
+      const msg = `تم حذف الكتاب` +
+        (borrows.length ? ` + ${borrows.length} طلب استعارة` : '') +
+        (waitlist.length ? ` + ${waitlist.length} من قائمة الانتظار` : '') + ` ✅`;
+      toast(msg, 'success');
+      loadBooksTable();
+    } catch(e) { toast('خطأ أثناء الحذف', 'error'); }
+  });
+}
+
+/* ── BORROWS TABLE ── */
+function switchBorrowTab(filter, event) {
+  currentBorrowFilter = filter;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadBorrowsTable(filter);
+}
+
+async function loadBorrowsTable(filter) {
+  const [borrows, books, users] = await Promise.all([
+    api.get('/borrows?_sort=request_date&_order=desc'),
+    api.get('/books'),
+    api.get('/users')
+  ]);
+  const bookMap = {}; books.forEach(b => bookMap[b.id] = b);
+  const userMap = {}; users.forEach(u => userMap[u.id] = u);
+
+  let filtered = borrows;
+  if (filter === 'pending') filtered = borrows.filter(b => b.status === 'pending');
+  else if (filter === 'active') filtered = borrows.filter(b => b.status === 'active');
+
+  document.getElementById('borrowsTable').innerHTML = filtered.map(b => {
+    const overdue = b.status === 'active' && dateUtil.isOverdue(b.due_date);
+    return `<tr ${overdue ? 'style="background:rgba(184,50,50,0.04)"' : ''}>
+      <td>${userMap[b.user_id]?.name || '—'}</td>
+      <td><a href="book.html?id=${b.book_id}" target="_blank" style="color:var(--primary);font-weight:700">${bookMap[b.book_id]?.title || '—'}</a></td>
+      <td>${dateUtil.format(b.request_date)}</td>
+      <td>${statusLabel[b.status] || b.status}${overdue ? ' <span style="color:var(--danger);font-size:0.75rem">متأخر!</span>' : ''}</td>
+      <td>
+        ${b.status === 'pending' ? `
+          <button class="btn btn-success btn-sm" onclick="approveBorrow(${b.id})">✅ موافقة</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectBorrow(${b.id})" style="margin-right:0.4rem">❌ رفض</button>` : ''}
+        ${b.status === 'active' ? `<button class="btn btn-primary btn-sm" onclick="returnBook(${b.id})">🔄 إرجاع</button>` : ''}
+        ${b.status === 'returned' || b.status === 'rejected' ? '<span style="color:var(--muted);font-size:0.8rem">—</span>' : ''}
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted)">لا توجد سجلات</td></tr>`;
+}
+
+async function approveBorrow(borrowId) {
+  const borrow = await api.get(`/borrows/${borrowId}`);
+  const book = await api.get(`/books/${borrow.book_id}`);
+
+  if (book.available_copies < 1) {
+    toast('لا توجد نسخ متاحة!', 'warning'); return;
+  }
+
+  await api.patch(`/borrows/${borrowId}`, {
+    status: 'active',
+    borrow_date: new Date().toISOString(),
+    due_date: dateUtil.addDays(14)
+  });
+
+  await api.patch(`/books/${borrow.book_id}`, {
+    available_copies: book.available_copies - 1
+  });
+
+  await sendNotification(borrow.user_id, 'borrow_approved',
+    `✅ تمت الموافقة على استعارة كتاب "${book.title}" — موعد الإرجاع خلال 14 يومًا`);
+
+  toast('تمت الموافقة على الاستعارة ✅', 'success');
+  loadBorrowsTable(currentBorrowFilter);
+  loadOverview();
+}
+
+async function rejectBorrow(borrowId) {
+  confirmAction('هل تريد رفض هذا الطلب؟', async () => {
+    const borrow = await api.get(`/borrows/${borrowId}`);
+    const book = await api.get(`/books/${borrow.book_id}`);
+    await api.patch(`/borrows/${borrowId}`, { status: 'rejected' });
+    await sendNotification(borrow.user_id, 'borrow_rejected',
+      `❌ تم رفض طلب استعارة كتاب "${book.title}"`);
+    toast('تم رفض الطلب', 'info');
+    loadBorrowsTable(currentBorrowFilter);
+  });
+}
+
+async function returnBook(borrowId) {
+  confirmAction('هل تريد تسجيل إرجاع هذا الكتاب؟', async () => {
+    const borrow = await api.get(`/borrows/${borrowId}`);
+    const book = await api.get(`/books/${borrow.book_id}`);
+
+    await api.patch(`/borrows/${borrowId}`, {
+      status: 'returned',
+      return_date: new Date().toISOString()
+    });
+
+    await api.patch(`/books/${borrow.book_id}`, {
+      available_copies: book.available_copies + 1
+    });
+
+    await sendNotification(borrow.user_id, 'book_returned',
+      `✅ تم تسجيل إرجاع كتاب "${book.title}" بنجاح`);
+
+    // Notify first in waitlist
+    const waitlist = await api.get(`/waitlist?book_id=${borrow.book_id}&status=waiting&_sort=joined_at`);
+    if (waitlist.length > 0) {
+      const first = waitlist[0];
+      await sendNotification(first.user_id, 'book_available',
+        `🎉 الكتاب "${book.title}" أصبح متاحًا! لديك 24 ساعة لتقديم طلب الاستعارة`);
+    }
+
+    toast('تم تسجيل الإرجاع ✅', 'success');
+    loadBorrowsTable(currentBorrowFilter);
+  });
+}
+
+/* ── WAITLIST ── */
+async function loadWaitlistTable() {
+  const [waitlist, books, users] = await Promise.all([
+    api.get('/waitlist?status=waiting&_sort=joined_at'),
+    api.get('/books'),
+    api.get('/users')
+  ]);
+  const bookMap = {}; books.forEach(b => bookMap[b.id] = b);
+  const userMap = {}; users.forEach(u => userMap[u.id] = u);
+
+  document.getElementById('waitlistTable').innerHTML = waitlist.map(w => `<tr>
+    <td>${userMap[w.user_id]?.name || '—'}</td>
+    <td><a href="book.html?id=${w.book_id}" target="_blank" style="color:var(--primary);font-weight:700">${bookMap[w.book_id]?.title || '—'}</a></td>
+    <td>#${w.position}</td>
+    <td>${dateUtil.format(w.joined_at)}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="removeFromWaitlist(${w.id})">إزالة</button></td>
+  </tr>`).join('') || `<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted)">قوائم الانتظار فارغة</td></tr>`;
+}
+
+async function removeFromWaitlist(id) {
+  confirmAction('هل تريد إزالة هذا الشخص من قائمة الانتظار؟', async () => {
+    await api.delete(`/waitlist/${id}`);
+    toast('تم الإزالة', 'info');
+    loadWaitlistTable();
+  });
+}
+
+/* ── USERS ── */
+async function loadUsersTable() {
+  allUsersData = await api.get('/users?role=user');
+  document.getElementById('usersTable').innerHTML = allUsersData.map(u => `<tr>
+    <td style="font-weight:700">${u.name}</td>
+    <td style="direction:ltr;text-align:right">${u.email}</td>
+    <td>${u.phone || '—'}</td>
+    <td><span class="status-badge ${u.status === 'active' ? 'status-active' : 'status-rejected'}">${u.status === 'active' ? '✅ نشط' : '🚫 محظور'}</span></td>
+    <td>${dateUtil.format(u.created_at)}</td>
+    <td>
+      ${u.status === 'active'
+        ? `<button class="btn btn-danger btn-sm" onclick="toggleUser(${u.id},'banned')">🚫 حظر</button>`
+        : `<button class="btn btn-success btn-sm" onclick="toggleUser(${u.id},'active')">✅ تفعيل</button>`}
+    </td>
+  </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">لا يوجد أعضاء</td></tr>`;
+}
+
+async function toggleUser(id, status) {
+  await api.patch(`/users/${id}`, { status });
+  toast(status === 'banned' ? 'تم حظر العضو' : 'تم تفعيل العضو', status === 'banned' ? 'warning' : 'success');
+  loadUsersTable();
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => loadOverview());
+
+
+/* ══════════════════════════════════════
+   DONATIONS
+══════════════════════════════════════ */
+let allDonationsData = [];
+let donationsUsers   = {};
+let currentDonFilter = 'pending';
+
+async function loadDonationsTable(filter) {
+  currentDonFilter = filter ?? currentDonFilter;
+  const endpoint = currentDonFilter
+    ? `/donations?status=${currentDonFilter}&_sort=submitted_at&_order=desc`
+    : `/donations?_sort=submitted_at&_order=desc`;
+
+  const [donations, users, cats] = await Promise.all([
+    api.get(endpoint),
+    api.get('/users'),
+    api.get('/categories')
+  ]);
+
+  donationsUsers = {};
+  users.forEach(u => donationsUsers[u.id] = u);
+  const catMap = {};
+  cats.forEach(c => catMap[c.id] = c);
+
+  const tbody = document.getElementById('donationsTable');
+  if (!donations.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:2rem"><div class="empty-icon">📭</div><div class="empty-title">لا توجد طلبات</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = donations.map(d => {
+    const u   = donationsUsers[d.user_id];
+    const cat = catMap[d.category_id] || {};
+    const typeLabel = d.donate_type === 'permanent'
+      ? '<span class="status-badge status-active">🎁 دائمة</span>'
+      : `<span class="status-badge status-pending">⏳ مؤقتة<br><small style="font-size:0.75rem">${d.return_date || ''}</small></span>`;
+    const statusBadge = {
+      pending:  '<span class="status-badge status-pending">⏳ معلق</span>',
+      approved: '<span class="status-badge status-returned">✅ مقبول</span>',
+      rejected: '<span class="status-badge status-rejected">❌ مرفوض</span>'
+    }[d.status] || d.status;
+
+    const actions = d.status === 'pending' ? `
+      <button class="btn btn-primary btn-sm" onclick="approveDonation(${d.id})">✅ قبول</button>
+      <button class="btn btn-danger  btn-sm" onclick="rejectDonation(${d.id})" style="margin-top:0.3rem">❌ رفض</button>` : '—';
+
+    return `<tr>
+      <td>
+        <div style="font-weight:700;color:var(--primary)">${d.title}</div>
+        <div style="font-size:0.8rem;color:var(--muted)">✍️ ${d.author} ${cat.icon ? '• ' + cat.icon + ' ' + cat.name : ''}</div>
+        ${d.cover ? `<img src="${d.cover}" style="width:40px;height:55px;object-fit:cover;border-radius:4px;margin-top:4px" onerror="this.style.display='none'">` : ''}
+      </td>
+      <td>${u ? u.name : '—'}<br><small style="color:var(--muted)">${u ? u.email : ''}</small></td>
+      <td>${typeLabel}</td>
+      <td style="font-size:0.85rem">${dateUtil.format(d.submitted_at)}</td>
+      <td>${statusBadge}</td>
+      <td style="display:flex;flex-direction:column;gap:0.3rem">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterDonations(status) {
+  currentDonFilter = status;
+  loadDonationsTable(status);
+}
+
+async function approveDonation(donId) {
+  const don = await api.get(`/donations/${donId}`);
+  confirmAction(`قبول إعارة كتاب "<strong>${don.title}</strong>"؟<br><small>سيُضاف الكتاب تلقائياً لمخزون المكتبة</small>`, async () => {
+    try {
+      // 1. إضافة الكتاب لجدول books
+      const newBook = await api.post('/books', {
+        title:            don.title,
+        author:           don.author,
+        isbn:             don.isbn || null,
+        category_id:      don.category_id || null,
+        total_copies:     1,
+        available_copies: 1,
+        cover:            don.cover || null,
+        description:      don.description || null,
+        publish_year:     don.publish_year || null,
+        donated_by:       don.user_id,
+        donate_type:      don.donate_type,
+        return_to_owner_date: don.return_date || null,
+        added_at:         new Date().toISOString()
+      });
+
+      // 2. تحديث حالة الطلب
+      await api.patch(`/donations/${donId}`, {
+        status:      'approved',
+        book_id:     newBook.id,
+        reviewed_at: new Date().toISOString()
+      });
+
+      // 3. إشعار المستخدم
+      const typeText = don.donate_type === 'permanent'
+        ? 'دائمة'
+        : `مؤقتة حتى ${don.return_date}`;
+      await sendNotification(don.user_id, 'donation_approved',
+        `✅ تم قبول إعارة كتابك "${don.title}" (${typeText}) وإضافته لكنز الكتب!`);
+
+      toast('تم قبول الكتاب وإضافته للمكتبة ✅', 'success');
+      loadDonationsTable(currentDonFilter);
+    } catch(e) {
+      toast('خطأ: ' + e.message, 'error');
+    }
+  });
+}
+
+async function rejectDonation(donId) {
+  const don = await api.get(`/donations/${donId}`);
+  confirmAction(`رفض طلب إعارة "<strong>${don.title}</strong>"؟`, async () => {
+    await api.patch(`/donations/${donId}`, {
+      status:      'rejected',
+      reviewed_at: new Date().toISOString()
+    });
+    await sendNotification(don.user_id, 'donation_rejected',
+      `❌ تم رفض طلب إعارة كتابك "${don.title}" من قِبل المكتبة.`);
+    toast('تم رفض الطلب', 'warning');
+    loadDonationsTable(currentDonFilter);
+  });
+}
+
+// تحميل عدد الطلبات المعلقة عند فتح الصفحة
+async function loadDonationsBadge() {
+  try {
+    const pending = await api.get('/donations?status=pending');
+    const badge   = document.getElementById('donationsBadge');
+    if (pending.length > 0) {
+      badge.textContent = pending.length;
+      badge.style.display = 'inline';
+    }
+  } catch(e) {}
+}
+loadDonationsBadge();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابي - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title" id="welcomeTitle">👤 حسابي</h1>
+      <div class="breadcrumb">الرئيسية ← حسابي</div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-wrapper">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(26,58,92,0.1)">📖</div>
+      <div><div class="stat-num" id="sActive">0</div><div class="stat-label">استعارات نشطة</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(212,136,10,0.1)">⏳</div>
+      <div><div class="stat-num" id="sPending">0</div><div class="stat-label">طلبات معلقة</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(46,125,82,0.1)">✅</div>
+      <div><div class="stat-num" id="sReturned">0</div><div class="stat-label">إجمالي مُرجع</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(200,135,42,0.1)">🕐</div>
+      <div><div class="stat-num" id="sWaiting">0</div><div class="stat-label">في قوائم انتظار</div></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('active')">📖 نشطة</button>
+    <button class="tab-btn" onclick="switchTab('pending')">⏳ طلبات معلقة</button>
+    <button class="tab-btn" onclick="switchTab('waitlist')">🕐 قوائم الانتظار</button>
+    <button class="tab-btn" onclick="switchTab('history')">📋 السجل الكامل</button>
+    <button class="tab-btn" onclick="switchTab('mydonations')">🎁 إعاراتي للمكتبة</button>
+  </div>
+
+  <!-- TAB: ACTIVE -->
+  <div class="tab-pane active" id="tab-active">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📖 الاستعارات النشطة</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>الكتاب</th>
+              <th>تاريخ الاستعارة</th>
+              <th>موعد الإرجاع</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="activeTable"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: PENDING -->
+  <div class="tab-pane" id="tab-pending">
+    <div class="card">
+      <div class="card-header"><div class="card-title">⏳ الطلبات المعلقة</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>الكتاب</th><th>تاريخ الطلب</th><th>الحالة</th><th>إجراء</th></tr>
+          </thead>
+          <tbody id="pendingTable"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: WAITLIST -->
+  <div class="tab-pane" id="tab-waitlist">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🕐 قوائم الانتظار</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>الكتاب</th><th>موقعي في القائمة</th><th>تاريخ الانضمام</th><th>إجراء</th></tr>
+          </thead>
+          <tbody id="waitlistTable"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: HISTORY -->
+  <div class="tab-pane" id="tab-history">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 سجل الاستعارات</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>الكتاب</th><th>تاريخ الاستعارة</th><th>تاريخ الإرجاع</th><th>الحالة</th></tr>
+          </thead>
+          <tbody id="historyTable"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- TAB: MY DONATIONS -->
+  <div class="tab-pane" id="tab-mydonations">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div></div>
+      <a href="donate.html" class="btn btn-primary btn-sm">🎁 إعارة كتاب جديد</a>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎁 كتبي المُعارة للمكتبة</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>الكتاب</th><th>نوع الإعارة</th><th>تاريخ الطلب</th><th>الحالة</th></tr>
+          </thead>
+          <tbody id="myDonationsTable"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer"><p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p></footer>
+
+<script src="core.js"></script>
+<script>
+if (!auth.require()) throw new Error('Not logged in');
+const user = auth.user;
+
+document.getElementById('welcomeTitle').textContent = `👋 مرحبًا، ${user.name}`;
+
+function switchTab(name) {
+  if (name === 'mydonations') { loadMyDonations(); }
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const [borrows, books, waitlist] = await Promise.all([
+      api.get(`/borrows?user_id=${user.id}&_sort=request_date&_order=desc`),
+      api.get('/books'),
+      api.get(`/waitlist?user_id=${user.id}&status=waiting`)
+    ]);
+
+    const bookMap = {};
+    books.forEach(b => bookMap[b.id] = b);
+
+    const active = borrows.filter(b => b.status === 'active');
+    const pending = borrows.filter(b => b.status === 'pending');
+    const returned = borrows.filter(b => b.status === 'returned');
+
+    // Stats
+    document.getElementById('sActive').textContent = active.length;
+    document.getElementById('sPending').textContent = pending.length;
+    document.getElementById('sReturned').textContent = returned.length;
+    document.getElementById('sWaiting').textContent = waitlist.length;
+
+    // Active table
+    const aTbl = document.getElementById('activeTable');
+    if (!active.length) {
+      aTbl.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:2rem"><div class="empty-icon">📭</div><div class="empty-title">لا توجد استعارات نشطة</div><a href="books.html" class="btn btn-primary" style="margin-top:1rem">تصفح الكتب</a></div></td></tr>`;
+    } else {
+      aTbl.innerHTML = active.map(b => {
+        const book = bookMap[b.book_id];
+        const overdue = dateUtil.isOverdue(b.due_date);
+        const days = dateUtil.daysUntil(b.due_date);
+        return `<tr>
+          <td><a href="book.html?id=${b.book_id}" style="font-weight:700;color:var(--primary)">${book?.title || '—'}</a></td>
+          <td>${dateUtil.format(b.borrow_date)}</td>
+          <td style="color:${overdue ? 'var(--danger)' : days <= 3 ? 'var(--warning)' : 'inherit'}">
+            ${dateUtil.format(b.due_date)}
+            ${overdue ? ' ⚠️ متأخر' : days <= 3 ? ` (${days} أيام)` : ''}
+          </td>
+          <td>${statusLabel.active}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Pending table
+    const pTbl = document.getElementById('pendingTable');
+    if (!pending.length) {
+      pTbl.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:2rem"><div class="empty-icon">✅</div><div class="empty-title">لا توجد طلبات معلقة</div></div></td></tr>`;
+    } else {
+      pTbl.innerHTML = pending.map(b => {
+        const book = bookMap[b.book_id];
+        return `<tr>
+          <td><a href="book.html?id=${b.book_id}" style="font-weight:700;color:var(--primary)">${book?.title || '—'}</a></td>
+          <td>${dateUtil.format(b.request_date)}</td>
+          <td>${statusLabel.pending}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="cancelRequest(${b.id})">إلغاء الطلب</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Waitlist table
+    const wTbl = document.getElementById('waitlistTable');
+    if (!waitlist.length) {
+      wTbl.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:2rem"><div class="empty-icon">🕐</div><div class="empty-title">لا توجد قوائم انتظار</div></div></td></tr>`;
+    } else {
+      wTbl.innerHTML = waitlist.map(w => {
+        const book = bookMap[w.book_id];
+        return `<tr>
+          <td><a href="book.html?id=${w.book_id}" style="font-weight:700;color:var(--primary)">${book?.title || '—'}</a></td>
+          <td>#${w.position}</td>
+          <td>${dateUtil.format(w.joined_at)}</td>
+          <td><button class="btn btn-outline btn-sm" onclick="leaveWaitlist(${w.id})">إلغاء الانتظار</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // History
+    const hTbl = document.getElementById('historyTable');
+    const allHistory = borrows.filter(b => b.status !== 'pending');
+    if (!allHistory.length) {
+      hTbl.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:2rem"><div class="empty-icon">📋</div><div class="empty-title">لا يوجد سجل بعد</div></div></td></tr>`;
+    } else {
+      hTbl.innerHTML = allHistory.map(b => {
+        const book = bookMap[b.book_id];
+        return `<tr>
+          <td><a href="book.html?id=${b.book_id}" style="font-weight:700;color:var(--primary)">${book?.title || '—'}</a></td>
+          <td>${dateUtil.format(b.borrow_date) || '—'}</td>
+          <td>${dateUtil.format(b.return_date) || '—'}</td>
+          <td>${statusLabel[b.status] || b.status}</td>
+        </tr>`;
+      }).join('');
+    }
+
+  } catch(e) {
+    toast('خطأ في تحميل البيانات', 'error');
+  }
+});
+
+async function cancelRequest(borrowId) {
+  confirmAction('هل تريد إلغاء هذا الطلب؟', async () => {
+    await api.delete(`/borrows/${borrowId}`);
+    toast('تم إلغاء الطلب', 'info');
+    setTimeout(() => location.reload(), 900);
+  });
+}
+
+async function leaveWaitlist(waitId) {
+  confirmAction('هل تريد إلغاء انتظارك؟', async () => {
+    await api.delete(`/waitlist/${waitId}`);
+    toast('تم إلغاء الانتظار', 'info');
+    setTimeout(() => location.reload(), 900);
+  });
+}
+
+async function loadMyDonations() {
+  const donations = await api.get(`/donations?user_id=${user.id}&_sort=submitted_at&_order=desc`);
+  const tbody = document.getElementById('myDonationsTable');
+  if (!donations.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:2rem">
+      <div class="empty-icon">🎁</div>
+      <div class="empty-title">لم تُعر أي كتاب بعد</div>
+      <a href="donate.html" class="btn btn-primary" style="margin-top:1rem">إعارة كتاب الآن</a>
+    </div></td></tr>`;
+    return;
+  }
+  const statusMap = {
+    pending:  '<span class="status-badge status-pending">⏳ قيد المراجعة</span>',
+    approved: '<span class="status-badge status-returned">✅ مقبول</span>',
+    rejected: '<span class="status-badge status-rejected">❌ مرفوض</span>'
+  };
+  tbody.innerHTML = donations.map(d => `<tr>
+    <td><strong style="color:var(--primary)">${d.title}</strong><br><small style="color:var(--muted)">✍️ ${d.author}</small></td>
+    <td>${d.donate_type === 'permanent' ? '🎁 دائمة' : `⏳ مؤقتة<br><small>${d.return_date || ''}</small>`}</td>
+    <td style="font-size:0.85rem">${dateUtil.format(d.submitted_at)}</td>
+    <td>${statusMap[d.status] || d.status}</td>
+  </tr>`).join('');
+}
+
+</script>
+</body>
+</html>

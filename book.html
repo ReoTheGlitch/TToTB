@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل الكتاب - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="container page-wrapper">
+
+  <div id="loadingState" style="text-align:center;padding:3rem">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);margin-top:1rem">جاري تحميل معلومات الكتاب...</p>
+  </div>
+
+  <div id="bookDetail" style="display:none">
+
+    <div style="margin-bottom:1.5rem">
+      <a href="books.html" class="btn btn-outline btn-sm">← العودة للفهرس</a>
+    </div>
+
+    <div class="book-detail-grid">
+
+      <!-- Cover -->
+      <div>
+        <img id="bookCover" src="" alt="" class="book-detail-cover">
+        <div id="availabilityBox" style="margin-top:1rem;padding:1rem;border-radius:var(--radius);text-align:center;border:2px solid"></div>
+      </div>
+
+      <!-- Info -->
+      <div>
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="card-body">
+            <h1 id="bookTitle" style="font-size:1.8rem;margin-bottom:0.3rem"></h1>
+            <p id="bookAuthor" style="color:var(--muted);font-size:1rem;margin-bottom:1.2rem"></p>
+            <p id="bookDesc" style="line-height:1.8;color:var(--text);margin-bottom:1.5rem"></p>
+            <ul class="book-meta-list" id="bookMeta"></ul>
+          </div>
+        </div>
+
+        <!-- Action Box -->
+        <div class="card" id="actionBox">
+          <div class="card-body" id="actionContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Waitlist section -->
+    <div id="waitlistSection" style="margin-top:2rem;display:none">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⏳ قائمة الانتظار</div>
+          <div id="waitCount" style="font-size:0.85rem;color:var(--muted)"></div>
+        </div>
+        <div class="card-body" id="waitlistBody"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p>
+</footer>
+
+<script src="core.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const bookId = parseInt(params.get('id'));
+
+if (!bookId) location.href = 'books.html';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const [book, catMap, waitlist] = await Promise.all([
+      api.get(`/books/${bookId}`),
+      getCategoryMap(),
+      api.get(`/waitlist?book_id=${bookId}&status=waiting&_sort=joined_at`)
+    ]);
+
+    document.title = `${book.title} - كنز الكتب`;
+
+    const cat = catMap[book.category_id];
+    const avail = book.available_copies > 0;
+    const user = auth.user;
+
+    // Cover
+    document.getElementById('bookCover').src = book.cover;
+    document.getElementById('bookCover').alt = book.title;
+
+    // Availability box
+    const availBox = document.getElementById('availabilityBox');
+    if (avail) {
+      availBox.style.cssText += 'background:rgba(46,125,82,0.08);border-color:var(--success);color:var(--success)';
+      availBox.innerHTML = `<strong>✅ متاح للاستعارة</strong><br><small>متبقي ${book.available_copies} من ${book.total_copies} نسخة</small>`;
+    } else {
+      availBox.style.cssText += 'background:rgba(184,50,50,0.08);border-color:var(--danger);color:var(--danger)';
+      availBox.innerHTML = `<strong>❌ غير متاح حاليًا</strong><br><small>${waitlist.length} شخص في قائمة الانتظار</small>`;
+    }
+
+    // Title & info
+    document.getElementById('bookTitle').textContent = book.title;
+    document.getElementById('bookAuthor').innerHTML = `✍️ ${book.author}`;
+    document.getElementById('bookDesc').textContent = book.description;
+
+    // Meta
+    document.getElementById('bookMeta').innerHTML = `
+      <li><span class="meta-key">التصنيف</span><span class="meta-val">${cat?.icon || ''} ${cat?.name || '—'}</span></li>
+      <li><span class="meta-key">سنة النشر</span><span class="meta-val">${book.publish_year > 0 ? book.publish_year : Math.abs(book.publish_year) + ' ق.م'}</span></li>
+      <li><span class="meta-key">الرقم التعريفي (ISBN)</span><span class="meta-val" style="direction:ltr">${book.isbn}</span></li>
+      <li><span class="meta-key">إجمالي النسخ</span><span class="meta-val">${book.total_copies} نسخة</span></li>
+      <li><span class="meta-key">النسخ المتاحة</span><span class="meta-val">${book.available_copies} نسخة</span></li>
+    `;
+
+    // Action box
+    await renderActionBox(book, user, waitlist);
+
+    // Waitlist
+    if (waitlist.length > 0) {
+      document.getElementById('waitlistSection').style.display = 'block';
+      document.getElementById('waitCount').textContent = `${waitlist.length} شخص ينتظر`;
+      if (user?.role === 'admin') {
+        const users = await api.get('/users');
+        const userMap = {};
+        users.forEach(u => userMap[u.id] = u);
+        document.getElementById('waitlistBody').innerHTML = waitlist.map((w, i) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px dashed var(--border)">
+            <span style="font-size:0.85rem">${i+1}. ${userMap[w.user_id]?.name || 'مستخدم'}</span>
+            <span style="font-size:0.78rem;color:var(--muted)">${dateUtil.format(w.joined_at)}</span>
+          </div>`).join('');
+      } else {
+        document.getElementById('waitlistBody').innerHTML = `<p style="color:var(--muted);font-size:0.87rem">يوجد ${waitlist.length} شخص في قائمة الانتظار لهذا الكتاب.</p>`;
+      }
+    }
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('bookDetail').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('loadingState').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">❌</div>
+        <div class="empty-title">الكتاب غير موجود</div>
+        <a href="books.html" class="btn btn-primary" style="margin-top:1rem">العودة للفهرس</a>
+      </div>`;
+  }
+});
+
+async function renderActionBox(book, user, waitlist) {
+  const content = document.getElementById('actionContent');
+
+  if (!user) {
+    content.innerHTML = `
+      <p style="color:var(--muted);margin-bottom:1rem;font-size:0.9rem">سجّل دخولك لاستعارة هذا الكتاب</p>
+      <a href="login.html" class="btn btn-primary btn-block">تسجيل الدخول للاستعارة</a>`;
+    return;
+  }
+
+  if (user.role === 'admin') {
+    content.innerHTML = `<p style="color:var(--muted);font-size:0.85rem">🔐 أنت تعرض هذه الصفحة كأدمن</p>`;
+    return;
+  }
+
+  // Check active borrow
+  const myBorrows = await api.get(`/borrows?user_id=${user.id}&book_id=${book.id}&status=active`);
+  if (myBorrows.length > 0) {
+    const b = myBorrows[0];
+    const overdue = dateUtil.isOverdue(b.due_date);
+    content.innerHTML = `
+      <div style="background:rgba(46,125,82,0.08);border:1px solid var(--success);border-radius:10px;padding:1rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem">📖</div>
+        <p style="font-weight:800;color:var(--success);margin-bottom:0.3rem">أنت تستعير هذا الكتاب</p>
+        <p style="font-size:0.83rem;color:${overdue ? 'var(--danger)' : 'var(--muted)'}">
+          ${overdue ? '⚠️ تجاوزت موعد الإرجاع!' : `موعد الإرجاع: ${dateUtil.format(b.due_date)}`}
+        </p>
+      </div>`;
+    return;
+  }
+
+  // Check pending request
+  const myPending = await api.get(`/borrows?user_id=${user.id}&book_id=${book.id}&status=pending`);
+  if (myPending.length > 0) {
+    content.innerHTML = `
+      <div style="background:rgba(212,136,10,0.08);border:1px solid var(--warning);border-radius:10px;padding:1rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem">⏳</div>
+        <p style="font-weight:800;color:var(--warning)">طلبك قيد المراجعة</p>
+        <p style="font-size:0.83rem;color:var(--muted)">انتظر موافقة الأدمن</p>
+      </div>`;
+    return;
+  }
+
+  // Check waitlist
+  const myWait = waitlist.find(w => w.user_id === user.id);
+  if (myWait) {
+    const pos = waitlist.indexOf(myWait) + 1;
+    content.innerHTML = `
+      <div style="background:rgba(26,58,92,0.08);border:1px solid var(--primary);border-radius:10px;padding:1rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem">🕐</div>
+        <p style="font-weight:800;color:var(--primary)">أنت في قائمة الانتظار</p>
+        <p style="font-size:0.83rem;color:var(--muted)">موقعك: ${pos} من ${waitlist.length}</p>
+        <button class="btn btn-outline btn-sm" style="margin-top:0.8rem" onclick="leaveWaitlist(${myWait.id})">إلغاء الانتظار</button>
+      </div>`;
+    return;
+  }
+
+  // Available — borrow button
+  if (book.available_copies > 0) {
+    content.innerHTML = `
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem">مدة الاستعارة: <strong>14 يوم</strong></p>
+      <a href="borrow.html?book_id=${book.id}" class="btn btn-primary btn-block btn-lg">
+        📚 استعر هذا الكتاب
+      </a>`;
+  } else {
+    content.innerHTML = `
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem">الكتاب غير متاح حاليًا — انضم لقائمة الانتظار وسيُخطَر بك عند توفره</p>
+      <button class="btn btn-accent btn-block btn-lg" onclick="joinWaitlist(${book.id})">
+        ⏳ انضم لقائمة الانتظار
+      </button>`;
+  }
+}
+
+async function requestBorrow(bookId) {
+  const user = auth.user;
+  if (!user) return location.href = 'login.html';
+
+  try {
+    // Check max borrows (limit 3)
+    const active = await api.get(`/borrows?user_id=${user.id}&status=active`);
+    const pending = await api.get(`/borrows?user_id=${user.id}&status=pending`);
+    if (active.length + pending.length >= 3) {
+      toast('لا يمكنك استعارة أكثر من 3 كتب في نفس الوقت', 'warning');
+      return;
+    }
+
+    await api.post('/borrows', {
+      book_id: bookId,
+      user_id: user.id,
+      request_date: new Date().toISOString(),
+      borrow_date: null,
+      due_date: null,
+      return_date: null,
+      status: 'pending'
+    });
+
+    // Notify admin
+    const admins = await api.get('/users?role=admin');
+    const book = await api.get(`/books/${bookId}`);
+    for (const a of admins) {
+      await sendNotification(a.id, 'new_request', `طلب استعارة جديد من ${user.name} للكتاب "${book.title}"`);
+    }
+
+    toast('تم إرسال طلب الاستعارة! سيراجعه الأدمن قريبًا ✅', 'success');
+    setTimeout(() => location.reload(), 1200);
+  } catch(e) {
+    toast('حدث خطأ، حاول مجددًا', 'error');
+  }
+}
+
+async function joinWaitlist(bookId) {
+  const user = auth.user;
+  if (!user) return location.href = 'login.html';
+
+  try {
+    const waitlist = await api.get(`/waitlist?book_id=${bookId}&status=waiting`);
+    await api.post('/waitlist', {
+      book_id: bookId,
+      user_id: user.id,
+      position: waitlist.length + 1,
+      joined_at: new Date().toISOString(),
+      status: 'waiting'
+    });
+    toast('تمت إضافتك لقائمة الانتظار ✅', 'success');
+    setTimeout(() => location.reload(), 1200);
+  } catch(e) {
+    toast('حدث خطأ، حاول مجددًا', 'error');
+  }
+}
+
+async function leaveWaitlist(waitId) {
+  confirmAction('هل تريد إلغاء انتظارك لهذا الكتاب؟', async () => {
+    await api.delete(`/waitlist/${waitId}`);
+    toast('تم إلغاء الانتظار', 'info');
+    setTimeout(() => location.reload(), 900);
+  });
+}
+</script>
+</body>
+</html>

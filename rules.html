@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قواعد المكتبة - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">📜 قواعد المكتبة</h1>
+      <div class="breadcrumb">الرئيسية ← قواعد المكتبة</div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-wrapper">
+
+  <!-- Quick Nav Tabs -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:1rem">
+      <button class="rules-tab active" onclick="scrollToSection('membership')">👤 العضوية</button>
+      <button class="rules-tab" onclick="scrollToSection('borrow')">📖 الاستعارة</button>
+      <button class="rules-tab" onclick="scrollToSection('return')">🔄 الإرجاع</button>
+      <button class="rules-tab" onclick="scrollToSection('fines')">⚠️ الغرامات</button>
+      <button class="rules-tab" onclick="scrollToSection('conduct')">🤝 السلوك</button>
+      <button class="rules-tab" onclick="scrollToSection('digital')">💻 الخدمات الرقمية</button>
+      <button class="rules-tab" onclick="scrollToSection('contact')">📞 التواصل</button>
+    </div>
+  </div>
+
+  <!-- Intro Banner -->
+  <div class="rules-banner">
+    <div style="font-size:2.8rem">📚</div>
+    <div>
+      <h2 style="margin-bottom:0.3rem;color:var(--primary)">مرحبًا بكم في كنز الكتب</h2>
+      <p style="color:var(--muted);font-size:0.95rem;line-height:1.7">
+        تهدف هذه القواعد إلى ضمان تجربة مريحة وعادلة لجميع أعضاء المكتبة. نرجو قراءتها بعناية والالتزام بها.
+        <br>آخر تحديث: <strong>يناير 2025</strong>
+      </p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem" class="rules-grid">
+
+    <!-- SECTION 1: MEMBERSHIP -->
+    <div class="rules-card" id="membership">
+      <div class="rules-card-header" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt))">
+        <span class="rules-icon">👤</span>
+        <h3>أحكام العضوية</h3>
+      </div>
+      <div class="rules-card-body">
+        <div class="rule-item">
+          <div class="rule-num">1</div>
+          <div class="rule-text">التسجيل في المكتبة مجاني ومتاح لجميع الأعمار.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">2</div>
+          <div class="rule-text">يجب تقديم بيانات صحيحة عند إنشاء الحساب (الاسم الكامل، البريد الإلكتروني، رقم الهاتف).</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">3</div>
+          <div class="rule-text">لا يُسمح بإنشاء أكثر من حساب واحد لكل شخص.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">4</div>
+          <div class="rule-text">يجب إبلاغ إدارة المكتبة فور اكتشاف أي استخدام غير مصرح به لحسابك.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">5</div>
+          <div class="rule-text">تحتفظ الإدارة بحق تعليق أو إلغاء العضوية عند مخالفة القواعد.</div>
+        </div>
+        <div class="rule-badge info">🔒 كلمة المرور سرية ولا تشاركها مع أحد</div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: BORROWING -->
+    <div class="rules-card" id="borrow">
+      <div class="rules-card-header" style="background:linear-gradient(135deg,#2e7d52,#3d9966)">
+        <span class="rules-icon">📖</span>
+        <h3>قواعد الاستعارة</h3>
+      </div>
+      <div class="rules-card-body">
+        <div class="rule-item">
+          <div class="rule-num">1</div>
+          <div class="rule-text">يحق لكل عضو استعارة <strong>حتى 3 كتب</strong> في نفس الوقت.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">2</div>
+          <div class="rule-text">مدة الاستعارة القياسية هي <strong>14 يومًا</strong> ويمكن اختيار 7 أو 21 يومًا.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">3</div>
+          <div class="rule-text">يمكن تجديد استعارة الكتاب <strong>مرة واحدة</strong> فقط إذا لم يكن مطلوبًا من قِبل عضو آخر.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">4</div>
+          <div class="rule-text">الكتب المصنفة كـ"مرجعية" غير متاحة للاستعارة وتُقرأ داخل المكتبة فقط.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">5</div>
+          <div class="rule-text">يُعلم العضو بموافقة طلبه أو رفضه خلال <strong>24 ساعة</strong>.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">6</div>
+          <div class="rule-text">عند اكتمال النسخ، يمكن الانضمام لقائمة الانتظار وسيُعلم العضو فور توفر نسخة.</div>
+        </div>
+        <div class="rule-badge success">✅ يُرسل إشعار تلقائي عند كل تغيير في حالة الطلب</div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: RETURN -->
+    <div class="rules-card" id="return">
+      <div class="rules-card-header" style="background:linear-gradient(135deg,var(--accent),var(--accent-lt))">
+        <span class="rules-icon">🔄</span>
+        <h3>قواعد الإرجاع</h3>
+      </div>
+      <div class="rules-card-body">
+        <div class="rule-item">
+          <div class="rule-num">1</div>
+          <div class="rule-text">يجب إرجاع الكتب في الموعد المحدد أو قبله.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">2</div>
+          <div class="rule-text">يُرسل تذكير تلقائي قبل <strong>3 أيام</strong> من موعد الإرجاع.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">3</div>
+          <div class="rule-text">يجب إرجاع الكتاب بنفس حالته — نظيفًا وغير ممزق أو مكتوب عليه.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">4</div>
+          <div class="rule-text">في حال فقدان الكتاب، يجب إبلاغ الإدارة فورًا وتحمّل تكلفة النسخة البديلة.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">5</div>
+          <div class="rule-text">لن يُسمح بالاستعارة مجددًا إذا كان لدى العضو كتب متأخرة غير مُرجعة.</div>
+        </div>
+        <div class="rule-badge warning">⚠️ التأخر يؤثر على أولويتك في الطلبات المستقبلية</div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: FINES -->
+    <div class="rules-card" id="fines">
+      <div class="rules-card-header" style="background:linear-gradient(135deg,var(--danger),#d44)">
+        <span class="rules-icon">⚠️</span>
+        <h3>الغرامات والعقوبات</h3>
+      </div>
+      <div class="rules-card-body">
+        <div class="rule-item">
+          <div class="rule-num">1</div>
+          <div class="rule-text">تأخر الإرجاع: <strong>50 ج.م لكل يوم</strong> تأخير عن الموعد المحدد.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">2</div>
+          <div class="rule-text">إتلاف الكتاب جزئيًا: رسوم إصلاح تحددها الإدارة.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">3</div>
+          <div class="rule-text">فقدان الكتاب: تكلفة استبدال كاملة + غرامة إدارية.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">4</div>
+          <div class="rule-text">التأخر لأكثر من <strong>30 يومًا</strong>: تعليق العضوية حتى سداد الغرامات وإرجاع الكتب.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">5</div>
+          <div class="rule-text">يمكن الطعن في أي غرامة خلال <strong>7 أيام</strong> من صدورها عبر التواصل مع الإدارة.</div>
+        </div>
+        <div class="rule-badge danger">❌ الغرامات المتراكمة تؤدي لإيقاف الحساب</div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: CONDUCT -->
+    <div class="rules-card" id="conduct">
+      <div class="rules-card-header" style="background:linear-gradient(135deg,#5c3a8a,#7d4fba)">
+        <span class="rules-icon">🤝</span>
+        <h3>السلوك وآداب الاستخدام</h3>
+      </div>
+      <div class="rules-card-body">
+        <div class="rule-item">
+          <div class="rule-num">1</div>
+          <div class="rule-text">يُمنع منعًا باتًا الكتابة على الكتب أو ثنيها أو إتلافها بأي شكل.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">2</div>
+          <div class="rule-text">يجب التعامل مع موظفي المكتبة والأعضاء الآخرين باحترام تام.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">3</div>
+          <div class="rule-text">يُمنع نشر أي محتوى مسيء أو مضلل عبر منصة المكتبة الإلكترونية.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">4</div>
+          <div class="rule-text">لا يجوز إعارة الكتب المستعارة من المكتبة لأشخاص آخرين.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">5</div>
+          <div class="rule-text">في حال وجود نزاع، يُحال الأمر لمدير المكتبة لاتخاذ القرار النهائي.</div>
+        </div>
+        <div class="rule-badge info">ℹ️ المخالفات المتكررة تؤدي للحرمان الدائم</div>
+      </div>
+    </div>
+
+    <!-- SECTION 6: DIGITAL -->
+    <div class="rules-card" id="digital">
+      <div class="rules-card-header" style="background:linear-gradient(135deg,#1a6e7a,#2a9aaa)">
+        <span class="rules-icon">💻</span>
+        <h3>الخدمات الرقمية والخصوصية</h3>
+      </div>
+      <div class="rules-card-body">
+        <div class="rule-item">
+          <div class="rule-num">1</div>
+          <div class="rule-text">تُحفظ بيانات الأعضاء بشكل آمن ولا تُشارك مع أي جهة خارجية.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">2</div>
+          <div class="rule-text">يمكن لكل عضو الاطلاع على بياناته الشخصية وطلب تعديلها أو حذفها.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">3</div>
+          <div class="rule-text">الإشعارات الإلكترونية تُرسل على البريد المسجل فقط، يُرجى التأكد من صحته.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">4</div>
+          <div class="rule-text">في حال نسيان كلمة المرور، يمكن طلب إعادة تعيينها من صفحة تسجيل الدخول.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-num">5</div>
+          <div class="rule-text">المكتبة غير مسؤولة عن أي ضرر ناتج عن استخدام بيانات اعتماد مسربة بفعل المستخدم.</div>
+        </div>
+        <div class="rule-badge success">🔐 نستخدم تشفير آمن لحماية بياناتك</div>
+      </div>
+    </div>
+
+  </div><!-- end grid -->
+
+  <!-- Summary Table -->
+  <div class="card" style="margin-top:1.5rem">
+    <div class="card-header">
+      <div class="card-title">📊 ملخص سريع — حدود الاستعارة</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>البند</th>
+            <th>التفاصيل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>🔢 الحد الأقصى للاستعارة المتزامنة</td><td><strong>3 كتب</strong></td></tr>
+          <tr><td>📅 المدة القياسية</td><td><strong>14 يومًا</strong> (خيارات: 7 / 14 / 21 يوم)</td></tr>
+          <tr><td>🔄 التجديد</td><td><strong>مرة واحدة</strong> فقط إذا لم يكن الكتاب محجوزًا</td></tr>
+          <tr><td>⏰ التذكير التلقائي</td><td><strong>قبل 3 أيام</strong> من موعد الإرجاع</td></tr>
+          <tr><td>💰 غرامة التأخير</td><td><strong>50 ج.م / يوم</strong></td></tr>
+          <tr><td>🚫 تعليق العضوية</td><td>بعد <strong>30 يوم</strong> تأخير متراكم</td></tr>
+          <tr><td>✅ وقت الموافقة على الطلب</td><td><strong>خلال 24 ساعة</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONTACT SECTION -->
+  <div class="card" id="contact" style="margin-top:1.5rem">
+    <div class="card-header">
+      <div class="card-title">📞 تواصل معنا</div>
+    </div>
+    <div style="padding:1.5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
+      <div class="contact-card">
+        <div class="contact-icon">📧</div>
+        <div class="contact-title">البريد الإلكتروني</div>
+        <div class="contact-val">info@alnoor-library.com</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">📱</div>
+        <div class="contact-title">رقم الهاتف</div>
+        <div class="contact-val">010-0000-0000</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">🕐</div>
+        <div class="contact-title">ساعات العمل</div>
+        <div class="contact-val">السبت – الخميس: 9ص – 9م</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">📍</div>
+        <div class="contact-title">الموقع</div>
+        <div class="contact-val">شارع النور، المكتبة الرئيسية</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;margin-top:2rem;padding:2rem;background:linear-gradient(135deg,var(--primary),var(--primary-lt));border-radius:var(--radius);color:#fff">
+    <div style="font-size:2rem;margin-bottom:0.7rem">📚</div>
+    <h3 style="margin-bottom:0.5rem">هل أنت مستعد للاستعارة؟</h3>
+    <p style="opacity:0.85;margin-bottom:1.3rem;font-size:0.92rem">تصفح مجموعتنا الواسعة من الكتب واستعر ما يعجبك الآن</p>
+    <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap">
+      <a href="books.html" class="btn btn-accent">📚 تصفح الكتب</a>
+      <a href="borrow.html" class="btn" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3)">📖 استعر الآن</a>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer"><p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p></footer>
+
+<style>
+/* Rules page styles */
+.rules-grid { }
+@media (max-width: 768px) { .rules-grid { grid-template-columns:1fr!important } }
+
+.rules-banner {
+  display:flex;gap:1.5rem;align-items:center;
+  background:var(--card);border-radius:var(--radius);padding:1.5rem 2rem;
+  box-shadow:var(--shadow-sm);margin-bottom:1.5rem;
+  border-right:5px solid var(--primary);
+}
+@media (max-width:500px) { .rules-banner { flex-direction:column;text-align:center } }
+
+.rules-tab {
+  padding:0.45rem 1rem;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--bg2);font-size:0.83rem;font-weight:700;color:var(--muted);
+  transition:all 0.2s;cursor:pointer;
+}
+.rules-tab:hover, .rules-tab.active {
+  background:var(--primary);color:#fff;border-color:var(--primary);
+}
+
+.rules-card {
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.rules-card-header {
+  display:flex;align-items:center;gap:0.8rem;padding:1.1rem 1.3rem;color:#fff;
+}
+.rules-icon { font-size:1.5rem;line-height:1 }
+.rules-card-header h3 { font-size:1rem;margin:0;font-weight:800 }
+.rules-card-body { padding:1.1rem 1.3rem;display:flex;flex-direction:column;gap:0.7rem }
+
+.rule-item { display:flex;gap:0.7rem;align-items:flex-start }
+.rule-num {
+  min-width:24px;height:24px;border-radius:50%;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.72rem;font-weight:900;color:var(--primary);flex-shrink:0;margin-top:1px;
+}
+.rule-text { font-size:0.87rem;line-height:1.6;color:var(--text) }
+.rule-text strong { color:var(--primary) }
+
+.rule-badge {
+  padding:0.45rem 0.9rem;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:700;margin-top:0.3rem;
+}
+.rule-badge.info    { background:rgba(26,58,92,0.08);color:var(--primary) }
+.rule-badge.success { background:rgba(46,125,82,0.1);color:var(--success) }
+.rule-badge.warning { background:rgba(212,136,10,0.1);color:var(--warning) }
+.rule-badge.danger  { background:rgba(184,50,50,0.1);color:var(--danger) }
+
+.contact-card {
+  background:var(--bg2);border-radius:var(--radius-sm);padding:1rem;text-align:center;
+  transition:box-shadow 0.2s;
+}
+.contact-card:hover { box-shadow:var(--shadow-sm) }
+.contact-icon { font-size:1.8rem;margin-bottom:0.4rem }
+.contact-title { font-size:0.78rem;color:var(--muted);font-weight:700;margin-bottom:0.2rem }
+.contact-val { font-size:0.88rem;font-weight:700;color:var(--primary) }
+</style>
+
+<script src="core.js"></script>
+<script>
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const offset = 80;
+  const top = el.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top, behavior:'smooth' });
+  // Highlight active tab
+  document.querySelectorAll('.rules-tab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('onclick').includes(id));
+  });
+}
+</script>
+</body>
+</html>

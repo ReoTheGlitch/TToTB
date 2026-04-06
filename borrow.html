@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استعارة كتاب - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">📖 استعارة كتاب</h1>
+      <div class="breadcrumb">الرئيسية ← <a href="books.html">الكتب</a> ← استعارة كتاب</div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-wrapper">
+
+  <!-- STEP INDICATOR -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;padding:0.5rem 0">
+      <div class="step-item active" id="step1-indicator">
+        <div class="step-circle">1</div>
+        <div class="step-label">اختر الكتاب</div>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-item" id="step2-indicator">
+        <div class="step-circle">2</div>
+        <div class="step-label">تأكيد الطلب</div>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-item" id="step3-indicator">
+        <div class="step-circle">3</div>
+        <div class="step-label">تم الإرسال</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1: CHOOSE BOOK -->
+  <div id="step1">
+    <!-- Search & Filter -->
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header">
+        <div class="card-title">🔍 ابحث عن كتاب</div>
+      </div>
+      <div style="padding:1.2rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:end">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">عنوان الكتاب أو اسم المؤلف</label>
+          <input type="text" class="form-input" id="searchInput" placeholder="اكتب للبحث..." oninput="filterBooks()">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">التصنيف</label>
+          <select class="form-input" id="catFilter" onchange="filterBooks()" title="اختر التصنيف">
+            <option value="">كل التصنيفات</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Books Grid -->
+    <div id="booksGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">
+        <div class="spinner" style="margin:0 auto 1rem"></div>
+        <p>جاري تحميل الكتب...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: CONFIRM -->
+  <div id="step2" style="display:none;max-width:560px;margin:0 auto">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 تأكيد طلب الاستعارة</div>
+      </div>
+      <div style="padding:1.5rem">
+
+        <!-- Book Summary -->
+        <div style="display:flex;gap:1.2rem;align-items:flex-start;background:var(--bg2);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem">
+          <img id="confirmCover" src="" alt="" style="width:70px;height:95px;object-fit:cover;border-radius:6px;flex-shrink:0">
+          <div>
+            <div style="font-weight:800;font-size:1.05rem;color:var(--primary)" id="confirmTitle">—</div>
+            <div style="color:var(--muted);font-size:0.88rem;margin-top:0.2rem" id="confirmAuthor">—</div>
+            <div style="margin-top:0.5rem" id="confirmAvail"></div>
+          </div>
+        </div>
+
+        <!-- Duration Choice -->
+        <div class="form-group">
+          <label class="form-label">⏱️ مدة الاستعارة</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.7rem" id="durationOptions">
+            <label class="duration-card" data-days="7">
+              <input type="radio" name="duration" value="7" style="display:none"> 
+              <div class="dur-circle">7</div>
+              <div class="dur-label">أيام</div>
+            </label>
+            <label class="duration-card active" data-days="14">
+              <input type="radio" name="duration" value="14" checked style="display:none">
+              <div class="dur-circle">14</div>
+              <div class="dur-label">يوم</div>
+            </label>
+            <label class="duration-card" data-days="21">
+              <input type="radio" name="duration" value="21" style="display:none">
+              <div class="dur-circle">21</div>
+              <div class="dur-label">يوم</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Due Date Preview -->
+        <div style="background:rgba(26,58,92,0.07);border-radius:var(--radius-sm);padding:0.9rem 1.1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center">
+          <span style="color:var(--muted);font-size:0.9rem">موعد الإرجاع المتوقع:</span>
+          <span style="font-weight:800;color:var(--primary)" id="dueDatePreview">—</span>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label class="form-label">💬 ملاحظات (اختياري)</label>
+          <textarea class="form-input" id="borrowNote" rows="2" placeholder="أي ملاحظات للمكتبة..."></textarea>
+        </div>
+
+        <!-- Warning for unavailable -->
+        <div id="waitlistWarning" style="display:none;background:rgba(212,136,10,0.1);border:1px solid var(--warning);border-radius:var(--radius-sm);padding:0.9rem;margin-bottom:1.2rem;font-size:0.88rem;color:var(--warning)">
+          ⚠️ هذا الكتاب غير متاح حاليًا. سيتم وضعك في قائمة الانتظار وستُعلم عند توفره.
+        </div>
+
+        <div style="display:flex;gap:0.8rem">
+          <button class="btn btn-outline" style="flex:1" onclick="backToStep1()">← رجوع</button>
+          <button class="btn btn-primary" style="flex:2" id="submitBtn" onclick="submitBorrow()">
+            ✅ إرسال طلب الاستعارة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: SUCCESS -->
+  <div id="step3" style="display:none;max-width:480px;margin:0 auto">
+    <div class="card" style="text-align:center;padding:3rem 2rem">
+      <div style="font-size:4rem;margin-bottom:1rem" id="successIcon">✅</div>
+      <h2 style="color:var(--primary);margin-bottom:0.5rem" id="successTitle">تم إرسال الطلب!</h2>
+      <p style="color:var(--muted);margin-bottom:2rem;line-height:1.7" id="successMsg">
+        تم إرسال طلب الاستعارة بنجاح. ستتلقى إشعارًا عند موافقة المكتبة.
+      </p>
+      <div id="successMeta" style="background:var(--bg2);border-radius:var(--radius-sm);padding:1rem;margin-bottom:2rem;text-align:right"></div>
+      <div style="display:flex;gap:0.8rem;justify-content:center">
+        <a href="dashboard.html" class="btn btn-primary">📋 حسابي</a>
+        <a href="books.html" class="btn btn-outline">📚 تصفح المزيد</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer"><p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p></footer>
+
+<style>
+/* Step Indicator */
+.step-item { display:flex;flex-direction:column;align-items:center;gap:0.4rem;min-width:90px }
+.step-circle {
+  width:40px;height:40px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--muted);font-size:0.95rem;
+  transition:all 0.3s;
+}
+.step-label { font-size:0.78rem;color:var(--muted);font-weight:600;transition:all 0.3s }
+.step-item.active .step-circle { background:var(--primary);border-color:var(--primary);color:#fff }
+.step-item.active .step-label { color:var(--primary) }
+.step-item.done .step-circle { background:var(--success);border-color:var(--success);color:#fff }
+.step-line { flex:1;height:2px;background:var(--border);transition:background 0.3s }
+.step-line.done { background:var(--success) }
+
+/* Borrow Book Card */
+.borrow-book-card {
+  background:var(--card);border-radius:var(--radius);border:2px solid transparent;
+  box-shadow:var(--shadow-sm);cursor:pointer;transition:all var(--transition);overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.borrow-book-card:hover { border-color:var(--primary-lt);box-shadow:var(--shadow);transform:translateY(-2px) }
+.borrow-book-card.selected { border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,58,92,0.15) }
+.borrow-book-card.unavailable { opacity:0.75 }
+.book-cover-wrap { position:relative;height:200px;overflow:hidden }
+.book-cover-wrap img { width:100%;height:100%;object-fit:cover;transition:transform 0.3s }
+.borrow-book-card:hover .book-cover-wrap img { transform:scale(1.04) }
+.avail-badge {
+  position:absolute;top:10px;left:10px;padding:0.25rem 0.65rem;border-radius:20px;
+  font-size:0.75rem;font-weight:700;
+}
+.avail-badge.yes { background:rgba(46,125,82,0.9);color:#fff }
+.avail-badge.no  { background:rgba(184,50,50,0.9);color:#fff }
+.book-info { padding:1rem;flex:1;display:flex;flex-direction:column;gap:0.3rem }
+.book-info .title { font-weight:800;color:var(--primary);font-size:0.95rem;line-height:1.3 }
+.book-info .author { font-size:0.82rem;color:var(--muted) }
+.book-info .meta { font-size:0.8rem;color:var(--muted);margin-top:auto }
+.borrow-book-card .select-btn {
+  margin:0 1rem 1rem;padding:0.5rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:700;
+  border:none;transition:all 0.2s;
+}
+.borrow-book-card:not(.unavailable) .select-btn { background:var(--primary);color:#fff }
+.borrow-book-card:not(.unavailable) .select-btn:hover { background:var(--primary-lt) }
+.borrow-book-card.unavailable .select-btn { background:var(--warning);color:#fff }
+
+/* Duration Cards */
+.duration-card {
+  border:2px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem;text-align:center;
+  cursor:pointer;transition:all 0.2s;
+}
+.duration-card:hover { border-color:var(--primary-lt) }
+.duration-card.active { border-color:var(--primary);background:rgba(26,58,92,0.06) }
+.dur-circle {
+  font-size:1.6rem;font-weight:900;color:var(--primary);line-height:1;
+}
+.dur-label { font-size:0.78rem;color:var(--muted);margin-top:0.2rem }
+
+/* No results */
+.empty-borrow { grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted) }
+.empty-borrow .empty-icon { font-size:3rem;margin-bottom:0.8rem }
+</style>
+
+<script src="core.js"></script>
+<script>
+if (!auth.require()) throw new Error('Not logged in');
+const user = auth.user;
+
+let allBooks = [];
+let allCategories = [];
+let selectedBook = null;
+let selectedDays = 14;
+
+// Load books & categories
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    [allBooks, allCategories] = await Promise.all([
+      api.get('/books'),
+      api.get('/categories')
+    ]);
+
+    // Populate category filter
+    const catFilter = document.getElementById('catFilter');
+    allCategories.forEach(c => {
+      catFilter.innerHTML += `<option value="${c.id}">${c.icon} ${c.name}</option>`;
+    });
+
+    // Check for pre-selected book from URL
+    const params = new URLSearchParams(location.search);
+    const preId = params.get('book_id');
+
+    renderBooks(allBooks);
+
+    if (preId) {
+      const book = allBooks.find(b => b.id == preId);
+      if (book) selectBook(book);
+    }
+
+  } catch(e) {
+    document.getElementById('booksGrid').innerHTML = `<div class="empty-borrow"><div class="empty-icon">⚠️</div><p>خطأ في تحميل الكتب</p></div>`;
+  }
+});
+
+function filterBooks() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const filtered = allBooks.filter(b => {
+    const matchText = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
+    const matchCat  = !cat || String(b.category_id) === String(cat);
+    return matchText && matchCat;
+  });
+  renderBooks(filtered);
+}
+
+function renderBooks(books) {
+  const grid = document.getElementById('booksGrid');
+  if (!books.length) {
+    grid.innerHTML = `<div class="empty-borrow"><div class="empty-icon">🔍</div><p>لا توجد كتب مطابقة</p></div>`;
+    return;
+  }
+  const catMap = {};
+  allCategories.forEach(c => catMap[c.id] = c);
+
+  grid.innerHTML = books.map(b => {
+    const avail = b.available_copies > 0;
+    const cat = catMap[b.category_id];
+    return `
+    <div class="borrow-book-card ${!avail ? 'unavailable' : ''} ${selectedBook?.id === b.id ? 'selected' : ''}" onclick="selectBook(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+      <div class="book-cover-wrap">
+        <img src="${b.cover}" alt="${b.title}" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop'">
+        <div class="avail-badge ${avail ? 'yes' : 'no'}">${avail ? `✅ متاح (${b.available_copies})` : '❌ غير متاح'}</div>
+      </div>
+      <div class="book-info">
+        <div class="title">${b.title}</div>
+        <div class="author">✍️ ${b.author}</div>
+        <div class="meta">${cat ? cat.icon + ' ' + cat.name : ''} • ${b.publish_year || '—'}</div>
+      </div>
+      <button class="select-btn" onclick="event.stopPropagation();selectBook(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+        ${avail ? '📖 استعارة هذا الكتاب' : '🕐 الانضمام لقائمة الانتظار'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function selectBook(book) {
+  // book might be JSON string from onclick attr
+  if (typeof book === 'string') book = JSON.parse(book);
+  selectedBook = book;
+
+  // Go to step 2
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = '';
+  setStep(2);
+
+  // Fill confirm panel
+  document.getElementById('confirmCover').src = book.cover || '';
+  document.getElementById('confirmTitle').textContent = book.title;
+  document.getElementById('confirmAuthor').textContent = '✍️ ' + book.author;
+
+  const avail = book.available_copies > 0;
+  document.getElementById('confirmAvail').innerHTML = avail
+    ? `<span class="status-badge status-active">✅ متاح — ${book.available_copies} نسخة</span>`
+    : `<span class="status-badge status-rejected">❌ غير متاح — قائمة انتظار</span>`;
+
+  document.getElementById('waitlistWarning').style.display = avail ? 'none' : '';
+  document.getElementById('submitBtn').textContent = avail
+    ? '✅ إرسال طلب الاستعارة'
+    : '🕐 الانضمام لقائمة الانتظار';
+
+  updateDueDate();
+}
+
+function backToStep1() {
+  document.getElementById('step1').style.display = '';
+  document.getElementById('step2').style.display = 'none';
+  setStep(1);
+}
+
+// Duration selection
+document.querySelectorAll('.duration-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.duration-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    selectedDays = parseInt(card.dataset.days);
+    card.querySelector('input').checked = true;
+    updateDueDate();
+  });
+});
+
+function updateDueDate() {
+  const due = new Date();
+  due.setDate(due.getDate() + selectedDays);
+  document.getElementById('dueDatePreview').textContent = due.toLocaleDateString('ar-SA', { year:'numeric', month:'long', day:'numeric' });
+}
+
+async function submitBorrow() {
+  if (!selectedBook) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإرسال...';
+
+  try {
+    const avail = selectedBook.available_copies > 0;
+
+    if (avail) {
+      // Check user doesn't already have active borrow for this book
+      const existing = await api.get(`/borrows?user_id=${user.id}&book_id=${selectedBook.id}&status=active`);
+      if (existing.length) {
+        toast('أنت تستعير هذا الكتاب بالفعل!', 'warning');
+        btn.disabled = false;
+        btn.textContent = '✅ إرسال طلب الاستعارة';
+        return;
+      }
+      const pendingCheck = await api.get(`/borrows?user_id=${user.id}&book_id=${selectedBook.id}&status=pending`);
+      if (pendingCheck.length) {
+        toast('لديك طلب معلق لهذا الكتاب بالفعل!', 'warning');
+        btn.disabled = false;
+        btn.textContent = '✅ إرسال طلب الاستعارة';
+        return;
+      }
+
+      const note = document.getElementById('borrowNote').value;
+      const borrow = await api.post('/borrows', {
+        user_id: user.id,
+        book_id: selectedBook.id,
+        status: 'pending',
+        request_date: new Date().toISOString(),
+        borrow_date: null,
+        due_date: dateUtil.addDays(selectedDays),
+        return_date: null,
+        note: note || null,
+        duration_days: selectedDays
+      });
+
+      showSuccess(false, borrow);
+
+    } else {
+      // Add to waitlist
+      const existWait = await api.get(`/waitlist?user_id=${user.id}&book_id=${selectedBook.id}&status=waiting`);
+      if (existWait.length) {
+        toast('أنت في قائمة الانتظار لهذا الكتاب بالفعل!', 'warning');
+        btn.disabled = false;
+        btn.textContent = '🕐 الانضمام لقائمة الانتظار';
+        return;
+      }
+      // Get current waitlist length for position
+      const waitlistForBook = await api.get(`/waitlist?book_id=${selectedBook.id}&status=waiting`);
+      const position = waitlistForBook.length + 1;
+
+      const entry = await api.post('/waitlist', {
+        user_id: user.id,
+        book_id: selectedBook.id,
+        status: 'waiting',
+        position,
+        joined_at: new Date().toISOString()
+      });
+
+      showSuccess(true, entry, position);
+    }
+
+  } catch(e) {
+    toast('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');
+    btn.disabled = false;
+    btn.textContent = selectedBook?.available_copies > 0 ? '✅ إرسال طلب الاستعارة' : '🕐 الانضمام لقائمة الانتظار';
+  }
+}
+
+function showSuccess(isWaitlist, record, position) {
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display = '';
+  setStep(3);
+
+  if (isWaitlist) {
+    document.getElementById('successIcon').textContent = '🕐';
+    document.getElementById('successTitle').textContent = 'تم الانضمام لقائمة الانتظار!';
+    document.getElementById('successMsg').textContent = 'تم تسجيلك في قائمة الانتظار. ستتلقى إشعارًا تلقائيًا عندما يصبح الكتاب متاحًا.';
+    document.getElementById('successMeta').innerHTML = `
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">الكتاب:</span><strong>${selectedBook.title}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0">
+        <span style="color:var(--muted)">موقعك في القائمة:</span><strong style="color:var(--warning)">#${position}</strong>
+      </div>`;
+  } else {
+    const due = new Date();
+    due.setDate(due.getDate() + selectedDays);
+    document.getElementById('successIcon').textContent = '✅';
+    document.getElementById('successTitle').textContent = 'تم إرسال الطلب!';
+    document.getElementById('successMsg').textContent = 'تم إرسال طلب الاستعارة بنجاح. ستتلقى إشعارًا عند موافقة المكتبة على الطلب.';
+    document.getElementById('successMeta').innerHTML = `
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">الكتاب:</span><strong>${selectedBook.title}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">مدة الاستعارة:</span><strong>${selectedDays} يوم</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0">
+        <span style="color:var(--muted)">موعد الإرجاع:</span>
+        <strong style="color:var(--primary)">${due.toLocaleDateString('ar-SA', { year:'numeric', month:'long', day:'numeric' })}</strong>
+      </div>`;
+  }
+}
+
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const ind = document.getElementById(`step${i}-indicator`);
+    ind.classList.remove('active', 'done');
+    if (i < n) ind.classList.add('done');
+    else if (i === n) ind.classList.add('active');
+  }
+  for (let i = 1; i <= 2; i++) {
+    const line = document.getElementById(`line${i}`);
+    line.classList.toggle('done', i < n);
+  }
+}
+</script>
+</body>
+</html>

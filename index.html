@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كنز الكتب - استعارة الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html">
+      <div class="brand-icon">📚</div>
+      كنز الكتب
+    </a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <h1 class="hero-title">مرحبًا بك في كنز الكتب 📖</h1>
+    <p class="hero-sub">اكتشف عالمًا من المعرفة — استعر كتابك المفضل بخطوات بسيطة</p>
+    <div class="hero-actions">
+      <a href="books.html" class="btn btn-accent btn-lg">🔍 تصفح الكتب</a>
+      <a href="borrow.html" class="btn btn-lg btn-hero-secondary">📖 استعر كتابًا</a>
+      <a href="register.html" class="btn btn-lg btn-hero-tertiary" id="heroRegBtn">إنشاء حساب مجاني</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num" id="statBooks">...</div>
+        <div class="hero-stat-label">كتاب في المكتبة</div>
+      </div>
+      <div>
+        <div class="hero-stat-num" id="statUsers">...</div>
+        <div class="hero-stat-label">عضو مسجّل</div>
+      </div>
+      <div>
+        <div class="hero-stat-num" id="statBorrows">...</div>
+        <div class="hero-stat-label">استعارة ناجحة</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LATEST BOOKS -->
+<section class="section-padded">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title-text">أحدث الكتب</h2>
+      <a href="books.html" class="btn btn-outline">عرض الكل ←</a>
+    </div>
+    <div class="books-grid" id="latestBooks">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section-padded-alt">
+  <div class="container">
+    <h2 class="section-title-text section-title-margin">تصفح حسب التصنيف</h2>
+    <div id="catsGrid" class="cats-grid"></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section-padded">
+  <div class="container">
+    <h2 class="section-title-text section-title-centered">كيف تعمل المكتبة؟</h2>
+    <div class="how-it-works-grid">
+      <div class="card how-it-works-card">
+        <div class="how-it-works-icon">🔍</div>
+        <h4 class="how-it-works-title">ابحث عن كتابك</h4>
+        <p class="how-it-works-desc">تصفح فهرس المكتبة وابحث عن الكتاب الذي تريده</p>
+      </div>
+      <div class="card how-it-works-card">
+        <div class="how-it-works-icon">📝</div>
+        <h4 class="how-it-works-title">قدّم طلب استعارة</h4>
+        <p class="how-it-works-desc">اضغط "اطلب استعارة" وانتظر موافقة الأدمن</p>
+      </div>
+      <div class="card how-it-works-card">
+        <div class="how-it-works-icon">✅</div>
+        <h4 class="how-it-works-title">استلم الكتاب</h4>
+        <p class="how-it-works-desc">بعد الموافقة، استلم كتابك واستمتع بالقراءة</p>
+      </div>
+      <div class="card how-it-works-card">
+        <div class="how-it-works-icon">🔄</div>
+        <h4 class="how-it-works-title">أعد الكتاب في الوقت</h4>
+        <p class="how-it-works-desc">ستصلك تذكيرات قبل انتهاء المدة</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p>
+</footer>
+
+<!-- FLOATING AI ASSISTANT (BOB) -->
+<div id="aiAssistant" class="ai-assistant">
+  <button id="aiToggle" class="ai-toggle" aria-label="مساعد ذكي">
+    <span class="ai-icon">🤖</span>
+    <span class="ai-pulse"></span>
+  </button>
+  
+  <div id="aiChat" class="ai-chat">
+    <div class="ai-header">
+      <div class="ai-header-info">
+        <span class="ai-avatar">🤖</span>
+        <div>
+          <div class="ai-name">بوب - المساعد الذكي</div>
+          <div class="ai-status">متصل الآن</div>
+        </div>
+      </div>
+      <button id="aiClose" class="ai-close" aria-label="إغلاق">✕</button>
+    </div>
+    
+    <div id="aiMessages" class="ai-messages">
+      <div class="ai-message ai-bot">
+        <span class="ai-message-avatar">🤖</span>
+        <div class="ai-message-content">
+          مرحباً! أنا بوب، مساعدك الذكي في كنز الكتب. كيف يمكنني مساعدتك اليوم؟
+        </div>
+      </div>
+    </div>
+    
+    <div class="ai-input-area">
+      <input type="text" id="aiInput" class="ai-input" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+      <button id="aiSend" class="ai-send" aria-label="إرسال">
+        <span>إرسال</span>
+        <span class="ai-send-icon">➤</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="core.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  // Hide register btn if logged in
+  const user = auth.user;
+  if (user) document.getElementById('heroRegBtn').style.display = 'none';
+
+  // Stats
+  try {
+    const [books, users, borrows] = await Promise.all([
+      api.get('/books'), api.get('/users?role=user'), api.get('/borrows')
+    ]);
+    document.getElementById('statBooks').textContent = books.length;
+    document.getElementById('statUsers').textContent = users.length;
+    document.getElementById('statBorrows').textContent = borrows.filter(b => b.status !== 'pending').length;
+  } catch(e) {}
+
+  // Latest books
+  try {
+    const [books, catMap] = await Promise.all([
+      api.get('/books?_sort=added_at&_order=desc&_limit=8'),
+      getCategoryMap()
+    ]);
+    const grid = document.getElementById('latestBooks');
+    grid.innerHTML = '';
+    books.forEach(book => {
+      const cat = catMap[book.category_id];
+      const avail = book.available_copies > 0;
+      const div = document.createElement('div');
+      div.className = 'book-card fade-in';
+      div.innerHTML = `
+        <div class="book-cover-wrap">
+          <img src="${book.cover}" alt="${book.title}" class="book-cover" loading="lazy">
+          <span class="book-status-badge ${avail ? 'badge-available' : 'badge-unavailable'}">
+            ${avail ? '✅ متاح' : '❌ غير متاح'}
+          </span>
+        </div>
+        <div class="book-info">
+          <div class="book-title">${book.title}</div>
+          <div class="book-author">${book.author}</div>
+          <span class="book-cat">${cat?.icon || ''} ${cat?.name || ''}</span>
+        </div>`;
+      div.onclick = () => location.href = `book.html?id=${book.id}`;
+      grid.appendChild(div);
+    });
+  } catch(e) {
+    document.getElementById('latestBooks').innerHTML = `<p class="error-message">⚠️ تعذّر تحميل الكتب</p>`;
+  }
+
+  // Categories
+  try {
+    const cats = await api.get('/categories');
+    const grid = document.getElementById('catsGrid');
+    cats.forEach(cat => {
+      const a = document.createElement('a');
+      a.href = `books.html?cat=${cat.id}`;
+      a.innerHTML = `
+        <div class="card cat-card">
+          <div class="cat-card-icon">${cat.icon}</div>
+          <div class="cat-card-name">${cat.name}</div>
+        </div>`;
+      grid.appendChild(a);
+    });
+  } catch(e) {}
+
+  // AI Assistant (Bob) functionality
+  const aiToggle = document.getElementById('aiToggle');
+  const aiChat = document.getElementById('aiChat');
+  const aiClose = document.getElementById('aiClose');
+  const aiInput = document.getElementById('aiInput');
+  const aiSend = document.getElementById('aiSend');
+  const aiMessages = document.getElementById('aiMessages');
+
+  // Load website data for AI
+  let websiteData = {
+    books: [],
+    categories: [],
+    stats: { books: 0, users: 0, borrows: 0 }
+  };
+
+  async function loadWebsiteData() {
+    try {
+      const [books, categories, users, borrows] = await Promise.all([
+        api.get('/books'),
+        api.get('/categories'),
+        api.get('/users?role=user'),
+        api.get('/borrows')
+      ]);
+      websiteData.books = books;
+      websiteData.categories = categories;
+      websiteData.stats = {
+        books: books.length,
+        users: users.length,
+        borrows: borrows.filter(b => b.status !== 'pending').length
+      };
+    } catch(e) {
+      console.log('Failed to load website data for AI:', e);
+    }
+  }
+
+  loadWebsiteData();
+
+  // Toggle chat
+  aiToggle.addEventListener('click', () => {
+    aiChat.classList.toggle('open');
+    if (aiChat.classList.contains('open')) {
+      aiInput.focus();
+    }
+  });
+
+  // Close chat
+  aiClose.addEventListener('click', () => {
+    aiChat.classList.remove('open');
+  });
+
+  // Send message
+  const sendMessage = () => {
+    const message = aiInput.value.trim();
+    if (!message) return;
+
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'ai-message ai-user';
+    userMsg.innerHTML = `
+      <span class="ai-message-avatar">👤</span>
+      <div class="ai-message-content">${message}</div>
+    `;
+    aiMessages.appendChild(userMsg);
+    aiInput.value = '';
+
+    // Scroll to bottom
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = getBotResponse(message);
+      const botMsg = document.createElement('div');
+      botMsg.className = 'ai-message ai-bot';
+      botMsg.innerHTML = `
+        <span class="ai-message-avatar">🤖</span>
+        <div class="ai-message-content">${botResponse}</div>
+      `;
+      aiMessages.appendChild(botMsg);
+      aiMessages.scrollTop = aiMessages.scrollHeight;
+    }, 800);
+  };
+
+  aiSend.addEventListener('click', sendMessage);
+  aiInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  // Bot responses with real data
+  function getBotResponse(message) {
+    const msg = message.toLowerCase();
+    
+    // Greetings
+    if (msg.includes('مرحبا') || msg.includes('السلام') || msg.includes('هلا') || msg.includes('أهلا')) {
+      return `مرحباً بك! أنا بوب، مساعدك الذكي في كنز الكتب. 📚
+
+لدينا حالياً ${websiteData.stats.books} كتاب و ${websiteData.stats.users} عضو مسجل و ${websiteData.stats.borrows} استعارة ناجحة.
+
+كيف يمكنني مساعدتك اليوم؟`;
+    }
+    
+    // Library name inquiry
+    if (msg.includes('اسم المكتبة') || msg.includes('اسم الموقع') || msg.includes('إسم المكتبة') || msg.includes('إسم الموقع') || msg.includes('what is the library name') || msg.includes('library name')) {
+      return 'اسم المكتبة هو: كنز الكتب 📚\n\nكنز الكتب هي مكتبة إلكترونية تهدف إلى تسهيل استعارة الكتب ونشر المعرفة.';
+    }
+    
+    // About the library
+    if (msg.includes('عن المكتبة') || msg.includes('عن الموقع') || msg.includes('what is this library') || msg.includes('tell me about the library')) {
+      return `كنز الكتب هي مكتبة إلكترونية تهدف إلى تسهيل استعارة الكتب ونشر المعرفة.\n\n📊 إحصائيات:\n• عدد الكتب: ${websiteData.stats.books}\n• عدد الأعضاء: ${websiteData.stats.users}\n• الاستعارات الناجحة: ${websiteData.stats.borrows}\n\n🎯 المميزات:\n• تصفح الكتب بسهولة\n• استعارة الكتب أونلاين\n• تصنيفات متنوعة\n• واجهة سهلة الاستخدام\n\nهل تريد معرفة المزيد؟`;
+    }
+    
+    // Books inquiry
+    if (msg.includes('كتاب') || msg.includes('كتب')) {
+      if (msg.includes('كم') || msg.includes('عدد')) {
+        return `لدينا حالياً ${websiteData.stats.books} كتاب في المكتبة. يمكنك تصفحها جميعاً من صفحة "تصفح الكتب".`;
+      }
+      if (msg.includes('متاح') || msg.includes('متوفر')) {
+        const availableBooks = websiteData.books.filter(b => b.available_copies > 0);
+        if (availableBooks.length > 0) {
+          const booksList = availableBooks.slice(0, 5).map(b => `• ${b.title} - ${b.author}`).join('\n');
+          return `لدينا ${availableBooks.length} كتاب متاح حالياً:\n\n${booksList}\n\nيمكنك تصفح المزيد من صفحة "تصفح الكتب".`;
+        }
+        return 'جميع الكتب مستعارة حالياً. يمكنك التحقق لاحقاً أو تصفح الكتب المتوقعة.';
+      }
+      if (msg.includes('جديد') || msg.includes('أحدث')) {
+        const latestBooks = websiteData.books.slice(0, 5);
+        if (latestBooks.length > 0) {
+          const booksList = latestBooks.map(b => `• ${b.title} - ${b.author}`).join('\n');
+          return `أحدث الكتب في المكتبة:\n\n${booksList}\n\nيمكنك تصفح المزيد من الصفحة الرئيسية.`;
+        }
+      }
+      if (msg.includes('بحث') || msg.includes('ابحث') || msg.includes('عن')) {
+        const searchTerm = msg.replace(/كتاب|كتب|بحث|ابحث|عن|لي|لى/g, '').trim();
+        if (searchTerm) {
+          const foundBooks = websiteData.books.filter(b => 
+            b.title.includes(searchTerm) || 
+            b.author.includes(searchTerm) ||
+            (b.description && b.description.includes(searchTerm))
+          );
+          if (foundBooks.length > 0) {
+            const booksList = foundBooks.slice(0, 5).map(b => `• ${b.title} - ${b.author}`).join('\n');
+            return `وجدت ${foundBooks.length} كتاب يحتوي على "${searchTerm}":\n\n${booksList}`;
+          }
+          return `لم أجد كتب تحتوي على "${searchTerm}". جرب البحث بكلمات أخرى.`;
+        }
+      }
+      return `لدينا ${websiteData.stats.books} كتاب في المكتبة. يمكنك:\n• تصفح جميع الكتب من صفحة "تصفح الكتب"
+• البحث عن كتاب معين
+• معرفة الكتب المتاحة
+• معرفة أحدث الكتب
+
+ما الذي تبحث عنه؟`;
+    }
+    
+    // Categories
+    if (msg.includes('تصنيف') || msg.includes('فئة') || msg.includes('تصنيفات') || msg.includes('فئات')) {
+      if (websiteData.categories.length > 0) {
+        const catsList = websiteData.categories.map(c => `${c.icon} ${c.name}`).join('\n• ');
+        return `لدينا ${websiteData.categories.length} تصنيف:\n\n• ${catsList}\n\nيمكنك تصفح الكتب حسب التصنيف من الصفحة الرئيسية.`;
+      }
+      return 'يمكنك تصفح التصنيفات من الصفحة الرئيسية.';
+    }
+    
+    // Borrowing
+    if (msg.includes('استعارة') || msg.includes('استعر')) {
+      if (msg.includes('كيف') || msg.includes('طريقة') || msg.includes('ازاي')) {
+        return `لاستعارة كتاب:\n\n1. سجّل الدخول إلى حسابك\n2. اذهب إلى صفحة الكتاب الذي تريده\n3. اضغط على "اطلب استعارة"\n4. انتظر موافقة الإدارة (خلال 24 ساعة)\n5. استلم الكتاب من المكتبة\n\nمدة الاستعارة 14 يوماً.`;
+      }
+      if (msg.includes('مدة') || msg.includes('وقت') || msg.includes('كم يوم')) {
+        return 'مدة الاستعارة 14 يوماً. يمكنك تجديد الاستعارة إذا لم يكن هناك طلب انتظار على الكتاب.';
+      }
+      if (msg.includes('شروط') || msg.includes('قواعد')) {
+        return 'شروط الاستعارة:\n\n• يجب أن تكون مسجلاً في الموقع\n• يجب الموافقة على شروط الاستعارة\n• مدة الاستعارة 14 يوماً\n• يجب إعادة الكتاب في الموعد\n• يمكن تجديد الاستعارة مرة واحدة\n• غرامة التأخير 5 جنيهات يومياً';
+      }
+      return 'لاستعارة كتاب، اذهب إلى صفحة الكتاب واضغط على "اطلب استعارة". سيتم مراجعة طلبك من قبل الإدارة خلال 24 ساعة.';
+    }
+    
+    // Registration
+    if (msg.includes('تسجيل') || msg.includes('حساب') || msg.includes('اشتراك')) {
+      if (msg.includes('كيف') || msg.includes('طريقة') || msg.includes('ازاي')) {
+        return `للتسجيل في المكتبة:\n\n1. اضغط على "إنشاء حساب" في الصفحة الرئيسية\n2. أدخل اسمك الكامل\n3. أدخل بريدك الإلكتروني\n4. أدخل كلمة المرور\n5. اضغط على "إنشاء حساب"\n\nسيتم إنشاء حسابك فوراً!`;
+      }
+      return 'يمكنك إنشاء حساب مجاني من خلال صفحة "إنشاء حساب". ستحتاج إلى بريد إلكتروني صالح.';
+    }
+    
+    // Help
+    if (msg.includes('مساعدة') || msg.includes('ساعد') || msg.includes('help')) {
+      return `يمكنني مساعدتك في:\n\n📚 الكتب: معرفة الكتب المتاحة، أحدث الكتب، البحث عن كتاب\n📖 الاستعارة: كيفية الاستعارة، المدة، الشروط\n📝 التسجيل: كيفية إنشاء حساب\n🏷️ التصنيفات: معرفة تصنيفات المكتبة\n📊 الإحصائيات: عدد الكتب والأعضاء\n\nاسألني أي شيء!`;
+    }
+    
+    // Statistics
+    if (msg.includes('إحصائيات') || msg.includes('عدد') || msg.includes('كم')) {
+      return `إحصائيات المكتبة:\n\n📚 عدد الكتب: ${websiteData.stats.books}\n👥 عدد الأعضاء: ${websiteData.stats.users}\n✅ الاستعارات الناجحة: ${websiteData.stats.borrows}\n\nيمكنك تصفح المزيد من الصفحة الرئيسية.`;
+    }
+    
+    // Thanks
+    if (msg.includes('شكرا') || msg.includes('شكراً') || msg.includes('متشكر')) {
+      return 'العفو! أنا هنا لمساعدتك دائماً. لا تتردد في السؤال عن أي شيء آخر. 😊';
+    }
+    
+    // Rules
+    if (msg.includes('شروط') || msg.includes('قواعد') || msg.includes('قوانين')) {
+      return 'يمكنك الاطلاع على شروط الاستعارة وقواعد المكتبة من خلال صفحة "الشروط والأحكام" في القائمة.';
+    }
+    
+    // Contact
+    if (msg.includes('تواصل') || msg.includes('اتصال') || msg.includes('联系')) {
+      return 'يمكنك التواصل مع إدارة المكتبة من خلال:\n\n📧 البريد الإلكتروني: info@alnoor-library.com\n📞 الهاتف: 01234567890\n📍 العنوان: القاهرة، مصر';
+    }
+    
+    // General Knowledge - Science
+    if (msg.includes('فيزياء') || msg.includes('physics')) {
+      return 'الفيزياء هي علم يدرس المادة والطاقة وتفاعلاتها. من أهم فروعها:\n\n• الميكانيكا: دراسة الحركة والقوى\n• الكهرومغناطيسية: دراسة الكهرباء والمغناطيسية\n• الفيزياء الحديثة: النسبية وميكانيكا الكم\n• الفيزياء الفلكية: دراسة الكون والنجوم\n\nهل تريد معرفة المزيد عن فرع معين؟';
+    }
+    
+    if (msg.includes('كيمياء') || msg.includes('chemistry')) {
+      return 'الكيمياء هي علم يدرس تركيب المواد وخصائصها وتحولاتها. من أهم فروعها:\n\n• الكيمياء العضوية: دراسة مركبات الكربون\n• الكيمياء غير العضوية: دراسة العناصر والمركبات\n• الكيمياء الحيوية: دراسة التفاعلات الكيميائية في الكائنات الحية\n• الكيمياء التحليلية: تحديد تركيب المواد\n\nهل تريد معرفة المزيد؟';
+    }
+    
+    if (msg.includes('أحياء') || msg.includes('biology') || msg.includes('biology')) {
+      return 'الأحياء هي علم يدرس الكائنات الحية وظائفها وتصنيفها. من أهم فروعها:\n\n• علم الخلية: دراسة بنية ووظيفة الخلايا\n• علم الوراثة: دراسة الجينات والوراثة\n• علم البيئة: دراسة التفاعل بين الكائنات وبيئتها\n• علم التشريح: دراسة بنية الكائنات الحية\n\nهل تريد معرفة المزيد؟';
+    }
+    
+    // General Knowledge - Mathematics
+    if (msg.includes('رياضيات') || msg.includes('math') || msg.includes('حساب') || msg.includes('جبر') || msg.includes('هندسة')) {
+      if (msg.includes('جمع') || msg.includes('زائد')) {
+        const numbers = msg.match(/\d+/g);
+        if (numbers && numbers.length >= 2) {
+          const sum = numbers.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+          return `نتيجة الجمع: ${numbers.join(' + ')} = ${sum}`;
+        }
+      }
+      if (msg.includes('طرح') || msg.includes('ناقص')) {
+        const numbers = msg.match(/\d+/g);
+        if (numbers && numbers.length >= 2) {
+          const result = numbers.reduce((a, b) => parseInt(a) - parseInt(b));
+          return `نتيجة الطرح: ${numbers.join(' - ')} = ${result}`;
+        }
+      }
+      if (msg.includes('ضرب') || msg.includes('×')) {
+        const numbers = msg.match(/\d+/g);
+        if (numbers && numbers.length >= 2) {
+          const result = numbers.reduce((a, b) => parseInt(a) * parseInt(b), 1);
+          return `نتيجة الضرب: ${numbers.join(' × ')} = ${result}`;
+        }
+      }
+      if (msg.includes('قسمة') || msg.includes('÷') || msg.includes('على')) {
+        const numbers = msg.match(/\d+/g);
+        if (numbers && numbers.length >= 2) {
+          const result = parseInt(numbers[0]) / parseInt(numbers[1]);
+          return `نتيجة القسمة: ${numbers[0]} ÷ ${numbers[1]} = ${result.toFixed(2)}`;
+        }
+      }
+      return 'الرياضيات هي علم يدرس الأرقام والأشكال والبنى المجردة. من أهم فروعها:\n\n• الجبر: دراسة المعادلات والمتغيرات\n• الهندسة: دراسة الأشكال والمساحات\n• الإحصاء: دراسة البيانات والاحتمالات\n• التفاضل والتكامل: دراسة التغير\n\nيمكنني مساعدتك في العمليات الحسابية الأساسية. جرب أن تسألني: 5 + 3';
+    }
+    
+    // General Knowledge - History
+    if (msg.includes('تاريخ') || msg.includes('history')) {
+      if (msg.includes('مصر') || msg.includes('egypt')) {
+        return 'تاريخ مصر غني وعريق:\n\n• الحضارة الفرعونية (3100 ق.م - 332 ق.م)\n• العصر اليوناني والبطلمي\n• العصر الروماني\n• الفتح الإسلامي (641 م)\n• العصر الفاطمي والأيوبي والمملوكي\n• العصر العثماني\n• العصر الحديث (محمد علي، ثورة 1919، ثورة 1952)\n\nهل تريد معرفة المزيد عن فترة معينة؟';
+      }
+      if (msg.includes('إسلام') || msg.includes('islam')) {
+        return 'تاريخ الإسلام:\n\n• البعثة النبوية (610 م)\n• الهجرة إلى المدينة (622 م)\n• فتح مكة (630 م)\n• عهد الخلفاء الراشدين (632-661 م)\n• الدولة الأموية (661-750 م)\n• الدولة العباسية (750-1258 م)\n• الدولة العثمانية (1299-1922 م)\n\nهل تريد معرفة المزيد عن فترة معينة؟';
+      }
+      return 'التاريخ هو علم يدرس أحداث الماضي وتطور الحضارات. من أهم فتراته:\n\n• العصور القديمة\n• العصور الوسطى\n• العصر الحديث\n• العصر المعاصر\n\nهل تريد معرفة المزيد عن حضارة أو فترة معينة؟';
+    }
+    
+    // General Knowledge - Geography
+    if (msg.includes('جغرافيا') || msg.includes('geography') || msg.includes('دول') || msg.includes('عواصم')) {
+      if (msg.includes('عاصمة') || msg.includes('capital')) {
+        const countries = {
+          'مصر': 'القاهرة',
+          'السعودية': 'الرياض',
+          'الإمارات': 'أبو ظبي',
+          'الكويت': 'الكويت',
+          'قطر': 'الدوحة',
+          'البحرين': 'المنامة',
+          'عُمان': 'مسقط',
+          'الأردن': 'عمان',
+          'لبنان': 'بيروت',
+          'سوريا': 'دمشق',
+          'العراق': 'بغداد',
+          'المغرب': 'الرباط',
+          'الجزائر': 'الجزائر',
+          'تونس': 'تونس',
+          'ليبيا': 'طرابلس',
+          'السودان': 'الخرطوم',
+          'فرنسا': 'باريس',
+          'ألمانيا': 'برلين',
+          'إيطاليا': 'روما',
+          'إسبانيا': 'مدريد',
+          'بريطانيا': 'لندن',
+          'أمريكا': 'واشنطن',
+          'الصين': 'بكين',
+          'اليابان': 'طوكيو',
+          'الهند': 'نيو دلهي'
+        };
+        for (const [country, capital] of Object.entries(countries)) {
+          if (msg.includes(country)) {
+            return `عاصمة ${country} هي ${capital}`;
+          }
+        }
+        return 'يمكنني مساعدتك في معرفة عواصم الدول. اسألني: ما عاصمة مصر؟';
+      }
+      return 'الجغرافيا هي علم يدرس سطح الأرض والظواهر الطبيعية. من أهم فروعها:\n\n• الجغرافيا الطبيعية: دراسة التضاريس والمناخ\n• الجغرافيا البشرية: دراسة السكان والحضارات\n• الجغرافيا الاقتصادية: دراسة الموارد والنشاط الاقتصادي\n\nهل تريد معرفة المزيد عن دولة أو منطقة معينة؟';
+    }
+    
+    // General Knowledge - Technology
+    if (msg.includes('تكنولوجيا') || msg.includes('technology') || msg.includes('كمبيوتر') || msg.includes('computer') || msg.includes('برمجة') || msg.includes('programming')) {
+      if (msg.includes('برمجة') || msg.includes('programming')) {
+        return 'البرمجة هي كتابة التعليمات للحاسوب. من أشهر اللغات:\n\n• Python: سهلة التعلم، للذكاء الاصطناعي\n• JavaScript: للمواقع والتطبيقات\n• Java: للتطبيقات المؤسسية\n• C++: للألعاب والأنظمة\n• PHP: للمواقع الديناميكية\n\nهل تريد معرفة المزيد عن لغة معينة؟';
+      }
+      return 'التكنولوجيا تتطور بسرعة كبيرة. من أهم المجالات:\n\n• الذكاء الاصطناعي والتعلم الآلي\n• الحوسبة السحابية\n• إنترنت الأشياء\n• البلوكتشين والعملات الرقمية\n• الواقع الافتراضي والمعزز\n\nهل تريد معرفة المزيد عن مجال معين؟';
+    }
+    
+    // General Knowledge - Languages
+    if (msg.includes('لغة') || msg.includes('language') || msg.includes('ترجمة') || msg.includes('translate')) {
+      if (msg.includes('إنجليزي') || msg.includes('english')) {
+        const translations = {
+          'مرحبا': 'Hello',
+          'شكرا': 'Thank you',
+          'مع السلامة': 'Goodbye',
+          'كتاب': 'Book',
+          'مكتبة': 'Library',
+          'علم': 'Science',
+          'تاريخ': 'History',
+          'جغرافيا': 'Geography'
+        };
+        for (const [arabic, english] of Object.entries(translations)) {
+          if (msg.includes(arabic)) {
+            return `${arabic} بالإنجليزية هي: ${english}`;
+          }
+        }
+        return 'يمكنني مساعدتك في ترجمة كلمات من العربية إلى الإنجليزية. اسألني: ما ترجمة كتاب؟';
+      }
+      return 'اللغات وسيلة للتواصل بين الناس. من أهم اللغات:\n\n• العربية: لغة القرآن والعالم العربي\n• الإنجليزية: لغة العلوم والأعمال\n• الفرنسية: لغة الثقافة والدبلوماسية\n• الإسبانية: لغة أمريكا اللاتينية\n• الصينية: لغة أكثر من مليار شخص\n\nهل تريد معرفة المزيد عن لغة معينة؟';
+    }
+    
+    // General Knowledge - Health
+    if (msg.includes('صحة') || msg.includes('health') || msg.includes('مرض') || msg.includes('علاج')) {
+      return 'الصحة نعمة كبيرة. من نصائح الصحة العامة:\n\n• تناول طعام صحي ومتوازن\n• مارس الرياضة بانتظام\n• احصل على نوم كافٍ\n• اشرب الكثير من الماء\n• تجنب التوتر والضغط النفسي\n• قم بفحوصات دورية\n\nهل تريد معرفة المزيد عن موضوع صحي معين؟';
+    }
+    
+    // General Knowledge - Sports
+    if (msg.includes('رياضة') || msg.includes('sports') || msg.includes('كرة') || msg.includes('football')) {
+      if (msg.includes('كرة القدم') || msg.includes('football')) {
+        return 'كرة القدم هي أشهر رياضة في العالم:\n\n• كأس العالم: يقام كل 4 سنوات\n• دوري أبطال أوروبا: أهم بطولة أندية\n• الدوري الإنجليزي: أشهر دوري في العالم\n• الدوري الإسباني: يضم ريال مدريد وبرشلونة\n\nهل تريد معرفة المزيد عن فريق أو بطولة معينة؟';
+      }
+      return 'الرياضة مهمة للصحة الجسدية والنفسية. من أشهر الرياضات:\n\n• كرة القدم\n• كرة السلة\n• كرة التنس\n• السباحة\n• ألعاب القوى\n• رياضة المشي\n\nهل تريد معرفة المزيد عن رياضة معينة؟';
+    }
+    
+    // General Knowledge - Arts
+    if (msg.includes('فن') || msg.includes('art') || msg.includes('رسم') || msg.includes('painting') || msg.includes('موسيقى') || msg.includes('music')) {
+      if (msg.includes('موسيقى') || msg.includes('music')) {
+        return 'الموسيقى فن الأصوات والإيقاع. من أشهر الأنواع:\n\n• الموسيقى الكلاسيكية: بيتهوفن، موزارت\n• موسيقى الجاز: لويس أرمسترونج\n• موسيقى الروك: البيتلز، كوين\n• الموسيقى العربية: أم كلثوم، عبد الحليم\n\nهل تريد معرفة المزيد عن نوع معين؟';
+      }
+      return 'الفن تعبير عن المشاعر والأفكار. من أشهر الفنون:\n\n• الرسم والتلوين\n• النحت\n• الموسيقى\n• الأدب والشعر\n• السينما والمسرح\n• العمارة\n\nهل تريد معرفة المزيد عن فن معين؟';
+    }
+    
+    // General Knowledge - Food
+    if (msg.includes('أكل') || msg.includes('food') || msg.includes('طبخ') || msg.includes('cooking') || msg.includes('وصفة') || msg.includes('recipe')) {
+      return 'الطعام جزء مهم من حياتنا. من النصائح الغذائية:\n\n• تناول الخضروات والفواكه يومياً\n• اشرب 8 أكواب من الماء يومياً\n• قلل من السكر والملح\n• تناول البروتينات الصحية\n• تجنب الأطعمة المصنعة\n\nهل تريد معرفة وصفة لطبق معين؟';
+    }
+    
+    // General Knowledge - Entertainment
+    if (msg.includes('فيلم') || msg.includes('film') || msg.includes('movie') || msg.includes('مسلسل') || msg.includes('series')) {
+      return 'السينما والتلفزيون وسيلة ترفيهية مهمة. من أشهر الأنواع:\n\n• الأفلام الكوميدية\n• الأفلام الدرامية\n• أفلام الأكشن والإثارة\n• أفلام الرعب\n• الأفلام الوثائقية\n• المسلسلات التلفزيونية\n\nهل تريد توصية لفيلم أو مسلسل معين؟';
+    }
+    
+    // General Knowledge - Education
+    if (msg.includes('تعليم') || msg.includes('education') || msg.includes('دراسة') || msg.includes('study') || msg.includes('مدرسة') || msg.includes('جامعة')) {
+      return 'التعليم هو مفتاح المستقبل. من نصائح النجاح في الدراسة:\n\n• حدد أهدافك بوضوح\n• نظم وقتك جيداً\n• راجع دروسك يومياً\n• اطلب المساعدة عند الحاجة\n• خذ استراحات منتظمة\n• ذاكر في مكان هادئ\n\nهل تريد مساعدة في مادة معينة؟';
+    }
+    
+    // General Knowledge - Travel
+    if (msg.includes('سفر') || msg.includes('travel') || msg.includes('سياحة') || msg.includes('tourism') || msg.includes('رحلة')) {
+      return 'السفر والسياحة وسيلة للاستمتاع واكتشاف ثقافات جديدة. من نصائح السفر:\n\n• احجز تذاكرك مبكراً\n• احضر جواز سفرك وتأشيرتك\n• احضر ملابس مناسبة للطقس\n• احفظ نقودك في مكان آمن\n• التقط صوراً تذكارية\n\nهل تريد اقتراح وجهة سفر معينة؟';
+    }
+    
+    // General Knowledge - Weather
+    if (msg.includes('طقس') || msg.includes('weather') || msg.includes('حرارة') || msg.includes('برد') || msg.includes('مطر')) {
+      return 'الطقس يؤثر على حياتنا اليومية. من أنواع الطقس:\n\n• الطقس المشمس: مثالي للأنشطة الخارجية\n• الطقس الممطر: احضر مظلتك\n• الطقس الحار: اشرب الكثير من الماء\n• الطقس البارد: ارتدِ ملابس دافئة\n\nهل تريد معرفة توقعات الطقس لمدينة معينة؟';
+    }
+    
+    // General Knowledge - Time
+    if (msg.includes('وقت') || msg.includes('time') || msg.includes('ساعة') || msg.includes('تاريخ اليوم') || msg.includes('date')) {
+      const now = new Date();
+      const time = now.toLocaleTimeString('ar-EG');
+      const date = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      return `الوقت الحالي: ${time}\nالتاريخ: ${date}`;
+    }
+    
+    // General Knowledge - Greetings
+    if (msg.includes('كيف حالك') || msg.includes('how are you') || msg.includes('أخبارك') || msg.includes('عامل ايه')) {
+      return 'أنا بخير، شكراً لسؤالك! 😊\n\nأنا مساعد ذكي، دائماً جاهز لمساعدتك. كيف يمكنني خدمتك اليوم؟';
+    }
+    
+    if (msg.includes('مين انت') || msg.includes('who are you') || msg.includes('عرف نفسك')) {
+      return 'أنا بوب، المساعد الذكي لكنز الكتب! 🤖\n\nيمكنني مساعدتك في:\n• معرفة الكتب المتاحة\n• كيفية الاستعارة\n• التسجيل في الموقع\n• الإجابة على أسئلة عامة\n• معلومات في العلوم والتاريخ والجغرافيا\n• مساعدة في الرياضيات\n• ועוד الكثير!\n\nاسألني أي شيء!';
+    }
+    
+    // Default response
+    return 'شكراً لرسالتك! أنا بوب، مساعدك الذكي.\n\nيمكنني مساعدتك في:\n\n📚 كنز الكتب:\n• الكتب المتاحة\n• كيفية الاستعارة\n• التسجيل في الموقع\n• التصنيفات\n• الإحصائيات\n\n🧠 معرفة عامة:\n• العلوم (فيزياء، كيمياء، أحياء)\n• الرياضيات (حساب، جبر، هندسة)\n• التاريخ (مصر، الإسلام، العالم)\n• الجغرافيا (دول، عواصم)\n• التكنولوجيا والبرمجة\n• اللغات والترجمة\n• الصحة والتغذية\n• الرياضة والفنون\n• السفر والترفيه\n\nاسألني أي شيء!';
+  }
+});
+</script>
+</body>
+</html>

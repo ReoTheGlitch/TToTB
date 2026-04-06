@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنشاء حساب - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { display:flex; flex-direction:column; min-height:100vh; }
+  .reg-wrap {
+    flex:1; display:flex; align-items:center; justify-content:center;
+    padding:2rem; background:linear-gradient(135deg, var(--primary) 0%, #0e2640 100%);
+  }
+  .reg-card {
+    background:var(--card); border-radius:20px; padding:2.5rem;
+    width:100%; max-width:460px; box-shadow:var(--shadow-lg);
+    animation: fadeIn 0.4s ease;
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="reg-wrap">
+  <div class="reg-card">
+    <div style="text-align:center;margin-bottom:2rem">
+      <span style="font-size:2.5rem">📝</span>
+      <h2 style="margin-top:0.5rem">إنشاء حساب جديد</h2>
+      <p style="color:var(--muted);font-size:0.85rem">انضم لكنز الكتب واستمتع بالقراءة</p>
+    </div>
+
+    <form id="regForm">
+      <div class="form-group">
+        <label class="form-label">الاسم الكامل</label>
+        <input type="text" id="name" class="form-control" placeholder="أدخل اسمك الكامل" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">البريد الإلكتروني</label>
+          <input type="email" id="email" class="form-control" placeholder="email@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رقم الجوال</label>
+          <input type="tel" id="phone" class="form-control" placeholder="05xxxxxxxx">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">كلمة المرور</label>
+          <input type="password" id="password" class="form-control" placeholder="6 أحرف على الأقل" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">تأكيد كلمة المرور</label>
+          <input type="password" id="password2" class="form-control" placeholder="أعد كتابة كلمة المرور" required>
+        </div>
+      </div>
+      <div id="regError" class="form-error" style="display:none;margin-bottom:1rem"></div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="regBtn">إنشاء الحساب</button>
+    </form>
+
+    <p style="text-align:center;margin-top:1.2rem;font-size:0.85rem;color:var(--muted)">
+      لديك حساب بالفعل؟ <a href="login.html" style="color:var(--primary);font-weight:700">تسجيل الدخول</a>
+    </p>
+  </div>
+</div>
+
+<script src="core.js"></script>
+<script>
+if (auth.user) location.href = 'index.html';
+
+document.getElementById('regForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name      = document.getElementById('name').value.trim();
+  const email     = document.getElementById('email').value.trim();
+  const phone     = document.getElementById('phone').value.trim();
+  const password  = document.getElementById('password').value;
+  const password2 = document.getElementById('password2').value;
+  const btn       = document.getElementById('regBtn');
+  const errDiv    = document.getElementById('regError');
+
+  errDiv.style.display = 'none';
+
+  if (password !== password2) {
+    errDiv.textContent = '❌ كلمتا المرور غير متطابقتين';
+    errDiv.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإنشاء...';
+
+  try {
+    // إنشاء المستخدم — الـ PHP سيشفّر كلمة المرور تلقائياً
+    const newUser = await api.post('/users', {
+      name, email, phone, password,
+      role: 'user', status: 'active',
+      created_at: new Date().toISOString()
+    });
+
+    // نعمل login عبر الـ endpoint الآمن
+    const res  = await fetch('login_api.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, password })
+    });
+    const user = await res.json();
+
+    auth.login(user);
+    toast('تم إنشاء حسابك بنجاح! 🎉', 'success');
+    setTimeout(() => location.href = 'dashboard.html', 900);
+
+  } catch(err) {
+    errDiv.textContent = err.message === 'SQLSTATE[23000]' || err.message?.includes('Duplicate')
+      ? '❌ هذا البريد الإلكتروني مسجّل مسبقًا'
+      : '⚠️ ' + (err.message || 'خطأ في الاتصال بالخادم');
+    errDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'إنشاء الحساب';
+  }
+});
+</script>
+</body>
+</html>

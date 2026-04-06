@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إعارة كتاب للمكتبة - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.donate-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.type-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.type-card:hover { border-color: var(--primary-lt); }
+.type-card.selected { border-color: var(--primary); background: rgba(26,58,92,0.05); }
+.type-card .type-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.type-card .type-title { font-weight: 800; color: var(--primary); font-size: 1rem; }
+.type-card .type-desc  { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.5; }
+.steps-bar {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; padding: 0.5rem 0; margin-bottom: 1.5rem;
+}
+.step-item { display:flex;flex-direction:column;align-items:center;gap:0.4rem;min-width:90px }
+.step-circle {
+  width:40px;height:40px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--muted);
+  transition:all 0.3s;
+}
+.step-label { font-size:0.78rem;color:var(--muted);font-weight:600 }
+.step-item.active .step-circle { background:var(--primary);border-color:var(--primary);color:#fff }
+.step-item.done   .step-circle { background:var(--success);border-color:var(--success);color:#fff }
+.step-line { flex:1;height:2px;background:var(--border);transition:background 0.3s;min-width:40px }
+.step-line.done { background:var(--success) }
+.cover-preview {
+  width: 100%; height: 200px; object-fit: cover;
+  border-radius: var(--radius-sm); display: none;
+  margin-top: 0.5rem;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">🎁 أعر كتابك للمكتبة</h1>
+      <div class="breadcrumb">الرئيسية ← إعارة كتاب للمكتبة</div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-wrapper" style="max-width:680px">
+
+  <!-- Steps -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="steps-bar">
+      <div class="step-item active" id="si1"><div class="step-circle">1</div><div class="step-label">نوع الإعارة</div></div>
+      <div class="step-line" id="sl1"></div>
+      <div class="step-item" id="si2"><div class="step-circle">2</div><div class="step-label">بيانات الكتاب</div></div>
+      <div class="step-line" id="sl2"></div>
+      <div class="step-item" id="si3"><div class="step-circle">3</div><div class="step-label">تم الإرسال</div></div>
+    </div>
+  </div>
+
+  <!-- STEP 1: نوع الإعارة -->
+  <div id="step1">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 اختر نوع الإعارة</div></div>
+      <div style="padding:1.5rem">
+        <div class="donate-type-grid">
+          <div class="type-card" id="card-permanent" onclick="selectType('permanent')">
+            <div class="type-icon">🎁</div>
+            <div class="type-title">إعارة دائمة</div>
+            <div class="type-desc">تتبرع بالكتاب للمكتبة نهائياً ويصبح ضمن مقتنياتها الدائمة</div>
+          </div>
+          <div class="type-card" id="card-temporary" onclick="selectType('temporary')">
+            <div class="type-icon">⏳</div>
+            <div class="type-title">إعارة مؤقتة</div>
+            <div class="type-desc">تُعير الكتاب للمكتبة لفترة محددة ثم يُعاد إليك</div>
+          </div>
+        </div>
+
+        <div id="returnDateGroup" style="display:none">
+          <div class="form-group">
+            <label class="form-label">📅 تاريخ إرجاع الكتاب إليك</label>
+            <input type="date" id="returnDate" class="form-input">
+            <small class="form-hint">الحد الأدنى أسبوع من اليوم</small>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="nextStep1Btn" onclick="goToStep2()" disabled>
+          التالي ←
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: بيانات الكتاب -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📚 بيانات الكتاب</div></div>
+      <div style="padding:1.5rem">
+
+        <div class="form-group">
+          <label class="form-label">عنوان الكتاب <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="bookTitle" class="form-input" placeholder="أدخل عنوان الكتاب" required>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group">
+            <label class="form-label">اسم المؤلف <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="bookAuthor" class="form-input" placeholder="اسم المؤلف" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">سنة النشر</label>
+            <input type="number" id="bookYear" class="form-input" placeholder="مثلاً 2020" min="1800" max="2099">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group">
+            <label class="form-label">التصنيف</label>
+            <select id="bookCategory" class="form-input">
+              <option value="">— اختر تصنيفاً —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ISBN (اختياري)</label>
+            <input type="text" id="bookIsbn" class="form-input" placeholder="978-...">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">وصف الكتاب (اختياري)</label>
+          <textarea id="bookDesc" class="form-input" rows="3" placeholder="نبذة مختصرة عن الكتاب..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">رابط صورة الغلاف (اختياري)</label>
+          <input type="url" id="bookCover" class="form-input" placeholder="https://..." oninput="previewCover(this.value)">
+          <img id="coverPreview" class="cover-preview" alt="معاينة الغلاف">
+        </div>
+
+        <div style="background:rgba(26,58,92,0.06);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;font-size:0.88rem">
+          <strong>📋 ملخص طلبك:</strong>
+          <div id="summaryText" style="margin-top:0.4rem;color:var(--muted)"></div>
+        </div>
+
+        <div style="display:flex;gap:0.8rem">
+          <button class="btn btn-outline" style="flex:1" onclick="backToStep1()">← رجوع</button>
+          <button class="btn btn-primary" style="flex:2" onclick="submitDonation()">
+            ✅ إرسال الطلب
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: نجاح -->
+  <div id="step3" style="display:none">
+    <div class="card" style="text-align:center;padding:3rem 2rem">
+      <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
+      <h2 style="color:var(--primary);margin-bottom:0.5rem">تم إرسال طلبك!</h2>
+      <p style="color:var(--muted);margin-bottom:2rem;line-height:1.7">
+        شكراً لك! سيراجع الأدمن طلبك ويوافق عليه قريباً.<br>
+        ستتلقى إشعاراً عند قبول كتابك في المكتبة.
+      </p>
+      <div id="step3Meta" style="background:var(--bg2);border-radius:var(--radius-sm);padding:1rem;margin-bottom:2rem;text-align:right"></div>
+      <div style="display:flex;gap:0.8rem;justify-content:center">
+        <a href="dashboard.html" class="btn btn-primary">📋 حسابي</a>
+        <a href="donate.html" class="btn btn-outline">🎁 إعارة كتاب آخر</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer"><p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p></footer>
+
+<script src="core.js"></script>
+<script>
+if (!auth.require()) throw new Error('not logged in');
+const user = auth.user;
+
+let selectedType = null;
+let categories   = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // تحميل التصنيفات
+  categories = await api.get('/categories');
+  const sel  = document.getElementById('bookCategory');
+  categories.forEach(c => {
+    sel.innerHTML += `<option value="${c.id}">${c.icon} ${c.name}</option>`;
+  });
+
+  // تحديد الحد الأدنى لتاريخ الإرجاع (أسبوع من اليوم)
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() + 7);
+  document.getElementById('returnDate').min = minDate.toISOString().split('T')[0];
+});
+
+function selectType(type) {
+  selectedType = type;
+  document.getElementById('card-permanent').classList.toggle('selected', type === 'permanent');
+  document.getElementById('card-temporary').classList.toggle('selected', type === 'temporary');
+  document.getElementById('returnDateGroup').style.display = type === 'temporary' ? '' : 'none';
+  document.getElementById('nextStep1Btn').disabled = false;
+}
+
+function goToStep2() {
+  if (!selectedType) return;
+  if (selectedType === 'temporary' && !document.getElementById('returnDate').value) {
+    toast('يرجى تحديد تاريخ إرجاع الكتاب إليك', 'warning');
+    return;
+  }
+
+  // تحديث الملخص
+  const typeText = selectedType === 'permanent' ? '🎁 إعارة دائمة (تبرع)' : `⏳ إعارة مؤقتة — ترجع إليك في ${document.getElementById('returnDate').value}`;
+  document.getElementById('summaryText').textContent = typeText;
+
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = '';
+  setStep(2);
+}
+
+function backToStep1() {
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step1').style.display = '';
+  setStep(1);
+}
+
+function previewCover(url) {
+  const img = document.getElementById('coverPreview');
+  if (url && url.startsWith('http')) {
+    img.src = url;
+    img.style.display = 'block';
+    img.onerror = () => { img.style.display = 'none'; };
+  } else {
+    img.style.display = 'none';
+  }
+}
+
+async function submitDonation() {
+  const title  = document.getElementById('bookTitle').value.trim();
+  const author = document.getElementById('bookAuthor').value.trim();
+
+  if (!title || !author) {
+    toast('العنوان واسم المؤلف مطلوبان', 'warning');
+    return;
+  }
+
+  const btn = document.querySelector('#step2 .btn-primary');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإرسال...';
+
+  try {
+    const payload = {
+      user_id:     user.id,
+      title,
+      author,
+      isbn:        document.getElementById('bookIsbn').value.trim()   || null,
+      category_id: document.getElementById('bookCategory').value      || null,
+      description: document.getElementById('bookDesc').value.trim()   || null,
+      publish_year:document.getElementById('bookYear').value          || null,
+      cover:       document.getElementById('bookCover').value.trim()  || null,
+      donate_type: selectedType,
+      return_date: selectedType === 'temporary'
+                   ? document.getElementById('returnDate').value
+                   : null,
+      status:      'pending',
+      submitted_at: new Date().toISOString()
+    };
+
+    const result = await api.post('/donations', payload);
+
+    // إشعار الأدمن
+    const admins = await api.get('/users?role=admin');
+    for (const a of admins) {
+      await sendNotification(a.id, 'donation_request',
+        `📚 طلب إعارة كتاب جديد: "${title}" من ${user.name} (${selectedType === 'permanent' ? 'دائمة' : 'مؤقتة'})`);
+    }
+
+    // عرض صفحة النجاح
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = '';
+    setStep(3);
+
+    document.getElementById('step3Meta').innerHTML = `
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">الكتاب:</span><strong>${title}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">المؤلف:</span><strong>${author}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0.4rem 0">
+        <span style="color:var(--muted)">نوع الإعارة:</span>
+        <strong>${selectedType === 'permanent' ? '🎁 دائمة' : '⏳ مؤقتة حتى ' + document.getElementById('returnDate').value}</strong>
+      </div>`;
+
+  } catch(e) {
+    toast('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');
+    btn.disabled = false;
+    btn.textContent = '✅ إرسال الطلب';
+  }
+}
+
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const si = document.getElementById(`si${i}`);
+    si.classList.remove('active','done');
+    if (i < n) si.classList.add('done');
+    else if (i === n) si.classList.add('active');
+  }
+  for (let i = 1; i <= 2; i++) {
+    document.getElementById(`sl${i}`).classList.toggle('done', i < n);
+  }
+}
+</script>
+</body>
+</html>

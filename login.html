@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { display:flex; flex-direction:column; min-height:100vh; }
+  .login-wrap {
+    flex:1; display:flex; align-items:center; justify-content:center;
+    padding:2rem; background:linear-gradient(135deg, var(--primary) 0%, #0e2640 100%);
+  }
+  .login-card {
+    background:var(--card); border-radius:20px; padding:2.5rem;
+    width:100%; max-width:420px; box-shadow:var(--shadow-lg);
+    animation: fadeIn 0.4s ease;
+  }
+  .login-logo { text-align:center; margin-bottom:2rem; }
+  .login-logo .icon { font-size:3rem; display:block; margin-bottom:0.5rem; }
+  .login-logo h1 { font-size:1.5rem; color:var(--primary); }
+  .login-logo p { color:var(--muted); font-size:0.85rem; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html">
+      <div class="brand-icon">📚</div> كنز الكتب
+    </a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="icon">📚</span>
+      <h1>كنز الكتب</h1>
+      <p>سجّل دخولك للمتابعة</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label">📧 البريد الإلكتروني</label>
+        <input type="email" id="email" class="form-control" placeholder="أدخل بريدك الإلكتروني" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🔒 كلمة المرور</label>
+        <input type="password" id="password" class="form-control" placeholder="أدخل كلمة المرور" required>
+        <div id="loginError" class="form-error" style="display:none"></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn">
+        تسجيل الدخول
+      </button>
+    </form>
+
+    <p style="text-align:center;margin-top:1.2rem;font-size:0.85rem;color:var(--muted)">
+      ليس لديك حساب؟ <a href="register.html" style="color:var(--primary);font-weight:700">إنشاء حساب جديد</a>
+    </p>
+  </div>
+</div>
+
+<script src="core.js"></script>
+<script>
+if (auth.user) {
+  location.href = auth.user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('loginBtn');
+  const errDiv   = document.getElementById('loginError');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الدخول...';
+  errDiv.style.display = 'none';
+
+  try {
+    // استخدام login_api.php المخصص للمصادقة الآمنة
+    const res = await fetch('login_api.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      errDiv.textContent = '❌ ' + (data.error || 'خطأ في تسجيل الدخول');
+      errDiv.style.display = 'block';
+      return;
+    }
+
+    auth.login(data);
+    toast('مرحبًا ' + data.name + ' 👋', 'success');
+    setTimeout(() => {
+      location.href = data.role === 'admin' ? 'admin.html' : 'dashboard.html';
+    }, 800);
+
+  } catch(err) {
+    errDiv.textContent = '⚠️ خطأ في الاتصال بالخادم';
+    errDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'تسجيل الدخول';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الملف الشخصي - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1 class="page-title">👤 الملف الشخصي</h1>
+  </div>
+</div>
+
+<div class="container page-wrapper" style="max-width:600px">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">تعديل البيانات الشخصية</div>
+    </div>
+    <div class="card-body">
+      <form id="profileForm">
+        <div class="form-group">
+          <label class="form-label">الاسم الكامل</label>
+          <input type="text" id="pName" class="form-control" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">البريد الإلكتروني</label>
+            <input type="email" id="pEmail" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم الجوال</label>
+            <input type="tel" id="pPhone" class="form-control">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 حفظ التغييرات</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.5rem">
+    <div class="card-header"><div class="card-title">🔒 تغيير كلمة المرور</div></div>
+    <div class="card-body">
+      <form id="pwForm">
+        <div class="form-group">
+          <label class="form-label">كلمة المرور الحالية</label>
+          <input type="password" id="pwCurrent" class="form-control" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">كلمة المرور الجديدة</label>
+            <input type="password" id="pwNew" class="form-control" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">تأكيد كلمة المرور</label>
+            <input type="password" id="pwConfirm" class="form-control" required>
+          </div>
+        </div>
+        <div id="pwError" class="form-error" style="display:none;margin-bottom:0.8rem"></div>
+        <button type="submit" class="btn btn-accent">🔑 تغيير كلمة المرور</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer class="footer"><p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p></footer>
+
+<script src="core.js"></script>
+<script>
+if (!auth.require()) throw new Error('');
+const user = auth.user;
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pName').value = user.name;
+  document.getElementById('pEmail').value = user.email;
+  document.getElementById('pPhone').value = user.phone || '';
+});
+
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('pName').value.trim();
+  const email = document.getElementById('pEmail').value.trim();
+  const phone = document.getElementById('pPhone').value.trim();
+  try {
+    const updated = await api.patch(`/users/${user.id}`, { name, email, phone });
+    auth.login({ ...user, ...updated });
+    toast('تم حفظ التغييرات ✅', 'success');
+  } catch(e) { toast('حدث خطأ في الحفظ', 'error'); }
+});
+
+document.getElementById('pwForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const current = document.getElementById('pwCurrent').value;
+  const newPw = document.getElementById('pwNew').value;
+  const confirm = document.getElementById('pwConfirm').value;
+  const errDiv = document.getElementById('pwError');
+  errDiv.style.display = 'none';
+
+  if (current !== user.password) {
+    errDiv.textContent = '❌ كلمة المرور الحالية غير صحيحة';
+    errDiv.style.display = 'block';
+    return;
+  }
+  if (newPw !== confirm) {
+    errDiv.textContent = '❌ كلمتا المرور الجديدة غير متطابقتين';
+    errDiv.style.display = 'block';
+    return;
+  }
+  try {
+    const updated = await api.patch(`/users/${user.id}`, { password: newPw });
+    auth.login({ ...user, password: newPw });
+    document.getElementById('pwForm').reset();
+    toast('تم تغيير كلمة المرور ✅', 'success');
+  } catch(e) { toast('حدث خطأ', 'error'); }
+});
+</script>
+</body>
+</html>

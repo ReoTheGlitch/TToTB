@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فهرس الكتب - كنز الكتب</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html"><div class="brand-icon">📚</div> كنز الكتب</a>
+    <ul class="navbar-links" id="navLinks"></ul>
+    <div class="navbar-actions" id="navActions"></div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">📚 فهرس الكتب</h1>
+      <div class="breadcrumb">الرئيسية ← الكتب</div>
+    </div>
+    <div id="bookCount" class="book-count"></div>
+  </div>
+</div>
+
+<div class="container page-wrapper">
+
+  <!-- SEARCH & FILTER -->
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن كتاب أو مؤلف...">
+    </div>
+    <select id="catFilter" class="filter-select" title="تصنيف الكتاب">
+      <option value="">جميع التصنيفات</option>
+    </select>
+    <select id="availFilter" class="filter-select" title="حالة التوفر">
+      <option value="">الكل</option>
+      <option value="available">متاح فقط</option>
+      <option value="unavailable">غير متاح</option>
+    </select>
+  </div>
+
+  <!-- BOOKS GRID -->
+  <div class="books-grid" id="booksGrid">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="emptyState" class="empty-state hidden">
+    <div class="empty-icon">📭</div>
+    <div class="empty-title">لا توجد كتب</div>
+    <div class="empty-sub">جرّب تغيير معايير البحث</div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>📚 كنز الكتب — جميع الحقوق محفوظة © 2024</p>
+</footer>
+
+<script src="core.js"></script>
+<script>
+let allBooks = [];
+let catMap = {};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load categories into filter
+  try {
+    const cats = await api.get('/categories');
+    const sel = document.getElementById('catFilter');
+    cats.forEach(c => {
+      catMap[c.id] = c;
+      sel.innerHTML += `<option value="${c.id}">${c.icon} ${c.name}</option>`;
+    });
+  } catch(e) {}
+
+  // Pre-select from URL param
+  const params = new URLSearchParams(location.search);
+  if (params.get('cat')) document.getElementById('catFilter').value = params.get('cat');
+
+  await loadBooks();
+
+  // Search / filter listeners
+  let searchTimer;
+  document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(renderBooks, 300);
+  });
+  document.getElementById('catFilter').addEventListener('change', renderBooks);
+  document.getElementById('availFilter').addEventListener('change', renderBooks);
+});
+
+async function loadBooks() {
+  try {
+    allBooks = await api.get('/books?_sort=added_at&_order=desc');
+    renderBooks();
+  } catch(e) {
+    document.getElementById('booksGrid').innerHTML = `
+      <p class="error-message">
+        ⚠️ تعذّر تحميل الكتب — تأكد من تشغيل JSON Server على المنفذ 3000
+      </p>`;
+  }
+}
+
+function renderBooks() {
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const avail = document.getElementById('availFilter').value;
+
+  let filtered = allBooks.filter(b => {
+    const matchSearch = !search || b.title.toLowerCase().includes(search) || b.author.toLowerCase().includes(search);
+    const matchCat = !cat || b.category_id == cat;
+    const matchAvail = !avail
+      || (avail === 'available' && b.available_copies > 0)
+      || (avail === 'unavailable' && b.available_copies === 0);
+    return matchSearch && matchCat && matchAvail;
+  });
+
+  const grid = document.getElementById('booksGrid');
+  const empty = document.getElementById('emptyState');
+
+  document.getElementById('bookCount').textContent = `${filtered.length} كتاب`;
+
+  if (!filtered.length) {
+    grid.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  grid.classList.remove('hidden');
+  empty.classList.add('hidden');
+  grid.innerHTML = '';
+
+  filtered.forEach((book, i) => {
+    const cat = catMap[book.category_id];
+    const avail = book.available_copies > 0;
+    const div = document.createElement('div');
+    div.className = 'book-card fade-in';
+    div.style.animationDelay = `${i * 0.04}s`;
+    div.innerHTML = `
+      <div class="book-cover-wrap">
+        <img src="${book.cover}" alt="${book.title}" class="book-cover" loading="lazy">
+        <span class="book-status-badge ${avail ? 'badge-available' : 'badge-unavailable'}">
+          ${avail ? `✅ متاح (${book.available_copies})` : '❌ غير متاح'}
+        </span>
+      </div>
+      <div class="book-info">
+        <div class="book-title">${book.title}</div>
+        <div class="book-author">✍️ ${book.author}</div>
+        <span class="book-cat">${cat?.icon || '📖'} ${cat?.name || 'عام'}</span>
+        <div class="book-card-btn">
+          <button class="btn btn-primary btn-sm btn-block">عرض التفاصيل</button>
+        </div>
+      </div>`;
+    div.addEventListener('click', () => location.href = `book.html?id=${book.id}`);
+    grid.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
